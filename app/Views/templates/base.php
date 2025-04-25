@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+    <!--begin::Head-->
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>Blog | <?= $this->renderSection('title') ?></title>
+        <!--begin::Primary Meta Tags-->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="title" content="Blog" />
+        <meta name="author" content="0x13" />
+        <meta
+            name="description"
+            content="AdminLTE is a Free Bootstrap 5 Admin Dashboard, 30 example pages using Vanilla JS."
+        />
+        <meta
+            name="keywords"
+            content="blog, post, article"
+        />
+        <!--end::Primary Meta Tags-->
+        <?= $this->include('components/styles') ?>
+        <?= $this->renderSection('custom_styles') ?>
+    </head>
+    <!--end::Head-->
+    <!--begin::Body-->
+    <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+        <!--begin::App Wrapper-->
+        <div class="app-wrapper">
+
+            <?= $this->include('components/navbar') ?>
+
+            <?= $this->include('components/sidebar') ?>
+
+            <?= $this->renderSection('content') ?>
+
+            <?= $this->include('components/scripts') ?>
+
+            <?= $this->renderSection('custom_scripts') ?>
+
+        </div>
+        <!--end::App Wrapper-->
+    </body>
+    <!--end::Body-->
+</html>
