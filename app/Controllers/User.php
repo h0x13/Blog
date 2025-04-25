@@ -82,7 +82,7 @@ class User extends BaseController
             'first_name' => 'required|min_length[2]|max_length[50]',
             'last_name' => 'required|min_length[2]|max_length[50]',
             'middle_name' => 'permit_empty|min_length[2]|max_length[50]',
-            'email' => "required|valid_email|is_unique[users.email,id,{$id}]",
+            'email' => "required|valid_email|is_unique[users.email,user_id,{$id}]",
             'password' => 'permit_empty|min_length[8]',
             'role' => 'required|in_list[admin,author,viewer]',
             'is_enabled' => 'required|in_list[0,1]',

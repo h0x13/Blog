@@ -29,19 +29,19 @@ Users
     </div>
     <!--end::App Content Header-->
 
-    <!-- Message Display -->
-    <?php if (isset($message)): ?>
-        <div class="container-fluid">
-            <div class="alert alert-<?= $message_type ?> alert-dismissible fade show" role="alert">
-                <?= $message?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        </div>
-        <?php ?>
-    <?php endif; ?>
-
     <!--begin::App Content-->
     <div class="app-content">
+
+        <!-- Message Display -->
+        <?php if (session()->getFlashdata('message')): ?>
+            <div class="container-fluid">
+                <div class="alert alert-<?= session()->getFlashdata('message_type') ?> alert-dismissible fade show" role="alert">
+                    <?= session()->getFlashdata('message') ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        <?php endif; ?>
+
         <!--begin::Container-->
         <div class="container-fluid">
             <div class="row">
@@ -81,7 +81,7 @@ Users
                                                         <td>
                                                             <!-- Edit Button -->
                                                             <button class="btn btn-sm btn-outline-primary edit-btn"
-                                                                data-id="<?= $row['id'] ?>"
+                                                                data-id="<?= $row['user_id'] ?>"
                                                                 data-fname="<?= $row['first_name'] ?>"
                                                                 data-lname="<?= $row['last_name'] ?>"
                                                                 data-mname="<?= $row['middle_name'] ?>"
@@ -99,7 +99,7 @@ Users
 
                                                             <!-- Delete Button -->
                                                             <button class="btn btn-sm btn-outline-danger delete-btn" 
-                                                                data-id="<?= $row['id'] ?>" 
+                                                                data-id="<?= $row['user_id'] ?>" 
                                                                 data-name="<?= $row['first_name'] . ' ' . $row['last_name'] ?>"
                                                                 data-bs-toggle="modal" 
                                                                 data-bs-target="#deleteModal">

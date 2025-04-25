@@ -49,7 +49,7 @@ function isActivePage($page) {
                 </li>
                 <li class="nav-item">
                     <a
-                        href="#"
+                        href="/blogs"
                         class="nav-link <?php isActivePage('blogs') ?>">
                         <i class="nav-icon bi bi-journal-text"></i>
                         <p>Manage Blogs</p>
@@ -57,7 +57,7 @@ function isActivePage($page) {
                 </li>
                 <li class="nav-item">
                     <a
-                        href="#"
+                        href="/categories"
                         class="nav-link <?php isActivePage('categories') ?>">
                         <i class="nav-icon bi bi-tags"></i>
                         <p>Manage Categories</p>
