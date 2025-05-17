@@ -9,12 +9,11 @@ function isActivePage($page) {
 ?>
 <aside
     class="app-sidebar bg-body-secondary shadow"
-    data-bs-theme="dark"
 >
     <!--begin::Sidebar Brand-->
     <div class="sidebar-brand">
         <!--begin::Brand Link-->
-        <a href="./index.html" class="brand-link d-flex justify-content-center align-items-center">
+        <a href="/" class="brand-link d-flex justify-content-center align-items-center">
             <!--begin::Brand Text-->
             <span class="brand-text fw-bold">BlogHub</span>
             <!--end::Brand Text-->
@@ -34,7 +33,7 @@ function isActivePage($page) {
                 <li class="nav-item">
                     <a
                         href="/dashboard"
-                        class="nav-link <?php isActivePage('index') ?>">
+                        class="nav-link <?php isActivePage('dashboard') ?>">
                         <i class="nav-icon bi bi-speedometer"></i>
                         <p>Dashboard</p>
                     </a>
@@ -44,7 +43,7 @@ function isActivePage($page) {
                         href="/users"
                         class="nav-link <?php isActivePage('users') ?>">
                         <i class="nav-icon bi bi-people"></i>
-                        <p>Manage User</p>
+                        <p>Manage Users</p>
                     </a>
                 </li>
                 <li class="nav-item">

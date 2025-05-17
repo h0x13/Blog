@@ -88,7 +88,7 @@ class User extends BaseController
             'is_enabled' => 'required|in_list[0,1]',
             'gender' => 'permit_empty|in_list[Male,Female,Other]',
             'birthdate' => 'permit_empty|valid_date',
-            'image' => 'permit_empty|uploaded[image]|max_size[image,2048]|is_image[image]|mime_in[image,image/jpg,image/jpeg,image/png]'
+            'image' => 'permit_empty|max_size[image,2048]|is_image[image]|mime_in[image,image/jpg,image/jpeg,image/png]'
         ])) {
             return redirect()->back()->withInput()->with('errors', $this->validation->getErrors());
         }

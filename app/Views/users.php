@@ -18,7 +18,7 @@ Users
                     <h3 class="mb-0">Manage Users</h3>
                 </div>
                 <div class="col-sm-6 text-end">
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addUserModal">
                         <i class="bi bi-plus-lg"></i> Add New User
                     </button>
                 </div>
@@ -80,7 +80,7 @@ Users
                                                         <td><?= date('d-m-Y H:i:s', strtotime($row['updated_at'])) ?></td>
                                                         <td>
                                                             <!-- Edit Button -->
-                                                            <button class="btn btn-sm btn-outline-primary edit-btn"
+                                                            <button class="btn btn-sm btn-success edit-btn"
                                                                 data-id="<?= $row['user_id'] ?>"
                                                                 data-fname="<?= $row['first_name'] ?>"
                                                                 data-lname="<?= $row['last_name'] ?>"
@@ -94,11 +94,11 @@ Users
                                                                 data-bs-toggle="modal"
                                                                 data-bs-target="#editUserModal"
                                                             >
-                                                                <i class="bi bi-pencil"></i> Edit
+                                                                <i class="bi bi-pencil-square"></i> Edit
                                                             </button>
 
                                                             <!-- Delete Button -->
-                                                            <button class="btn btn-sm btn-outline-danger delete-btn" 
+                                                            <button class="btn btn-sm btn-danger delete-btn" 
                                                                 data-id="<?= $row['user_id'] ?>" 
                                                                 data-name="<?= $row['first_name'] . ' ' . $row['last_name'] ?>"
                                                                 data-bs-toggle="modal" 

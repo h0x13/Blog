@@ -18,11 +18,11 @@
         />
         <!--end::Primary Meta Tags-->
         <?= $this->include('components/styles') ?>
-        <?= $this->renderSection('custom_styles') ?>
+        <?= $this->renderSection('styles') ?>
     </head>
     <!--end::Head-->
     <!--begin::Body-->
-    <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+    <body class="layout-fixed sidebar-expand-lg bg-body-tertiary" data-bs-theme="light">
         <!--begin::App Wrapper-->
         <div class="app-wrapper">
 
@@ -34,10 +34,10 @@
 
             <?= $this->include('components/scripts') ?>
 
-            <?= $this->renderSection('custom_scripts') ?>
 
         </div>
         <!--end::App Wrapper-->
+        <?= $this->renderSection('scripts') ?>
     </body>
     <!--end::Body-->
 </html>

@@ -18,7 +18,9 @@ Blogs
                     <h3 class="mb-0">Categories</h3>
                 </div>
                 <div class="col-sm-6 text-end">
-                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addCategoryModal">Add Category</button>
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                        <i class="bi bi-plus-lg"></i> Add Category
+                    </button>
                 </div>
             </div>
             <!--end::Row-->

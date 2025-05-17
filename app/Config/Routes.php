@@ -13,7 +13,7 @@ use CodeIgniter\Router\RouteCollection;
 $routes->get('/', [Home::class, 'index']);
 $routes->get('/about', [Home::class, 'about']);
 $routes->get('/dashboard', [Home::class, 'dashboard']);
-$routes->get('user-image/(:any)', [Image::class, 'image/$1']);
+$routes->get('user-image/(:segment)', [Image::class, 'image/$1']);
 
 // User routes
 $routes->group('users', function($routes) {
@@ -27,7 +27,17 @@ $routes->group('users', function($routes) {
 // Blog routes
 $routes->group('blogs', function($routes) {
     $routes->get('/', [Blog::class, 'index']);
-    $routes->get('/(:num)', [Category::class, 'get/$1']);
+    $routes->get('view/(:segment)', [Blog::class, 'view/$1']);
+    $routes->get('add', [Blog::class, 'create']);
+    $routes->post('add', [Blog::class, 'store']);
+    $routes->get('edit/(:segment)', [Blog::class, 'update/$1']);
+    $routes->post('edit/(:segment)', [Blog::class, 'save/$1']);
+    $routes->post('delete/(:segment)', [Blog::class, 'delete/$1']);
+
+    $routes->get('thumbnail/(:segment)', [Blog::class, 'thumbnail/$1']);
+    $routes->get('image/(:segment)', [Blog::class, 'image/$1']);
+    $routes->post('upload_image', [Blog::class, 'upload_image']);
+    $routes->post('delete_image', [Blog::class, 'delete_image']);
 });
 
 $routes->group('categories', function($routes) {
@@ -36,3 +46,4 @@ $routes->group('categories', function($routes) {
     $routes->post('edit/(:num)', [Category::class, 'edit/$1']);
     $routes->post('delete/(:num)', [Category::class, 'delete/$1']);
 });
+

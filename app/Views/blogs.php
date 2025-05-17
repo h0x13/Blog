@@ -15,10 +15,12 @@ Blogs
             <!--begin::Row-->
             <div class="row">
                 <div class="col-sm-6">
-                    <h3 class="mb-0">Blogs</h3>
+                    <h3 class="mb-0">Manage Blogs</h3>
                 </div>
                 <div class="col-sm-6 text-end">
-                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addCategoryModal">Add Blog Post</button>
+                    <a href="blogs/add" class="btn btn-success">
+                        <i class="bi bi-plus-lg"></i> Add Blog Post
+                    </a>
                 </div>
             </div>
             <!--end::Row-->
@@ -30,70 +32,41 @@ Blogs
     <!--begin::App Content-->
     <div class="app-content">
 
-        <!-- Message Display -->
-        <?php if (session()->getFlashdata('message')): ?>
-            <div class="container-fluid">
-                <div class="alert alert-<?= session()->getFlashdata('message_type') ?> alert-dismissible fade show" role="alert">
-                    <?= session()->getFlashdata('message') ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            </div>
-        <?php endif; ?>
+        <?= $this->include('blog_pages/message') ?>
 
         <!--begin::Container-->
         <div class="container-fluid">
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table id="usersTable" class="table table-striped table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Title</th>
-                                            <th>Content</th>
-                                            <th>Author</th>
-                                            <th>Visibility</th>
-                                            <th>Last Modified</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php
-                                            if (isset($blogs)) {
-                                                foreach ($blogs as $row) { ?>
-                                                    <?php $author = $row['first_name'] . ' ' . $row['middle_name'] . ' ' . $row['last_name'] ?>
-                                                    <tr>
-                                                        <td><?= $row['title'] ?></td>
-                                                        <td><?= $row['content'] ?></td>
-                                                        <td><?= $author ?></td>
-                                                        <td>
-                                                            <span class='badge bg-<?= $row['visibility'] !== 'private' ? 'success' : 'secondary' ?>'>
-                                                                <?= $row['visibility'] ?>
-                                                            </span>
-                                                        </td>
-                                                        <td><?= date('d-m-Y H:i:s', strtotime($row['updated_at'])) ?></td>
-                                                        <td class="text-nowrap">
-                                                            <button type="button" class="btn btn-secondary btn-sm">
-                                                                <i class="bi bi-gear"></i>
-                                                            </button>
-                                                            <button type="button" class="btn btn-danger btn-sm">
-                                                                <i class="bi bi-trash"></i>
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                        <?php 
-                                                }
-                                            } else {
-                                                echo '<tr><td class="text-danger" colspan="6">No users</td></tr>';
-                                            }
-                                        ?>
-                                    </tbody>
-                                </table>
+            <div class="row bg-transparent">
+                <?php
+                    if (isset($blogs)) {
+                        foreach ($blogs as $blog) { ?>
+                            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3 mb-sm-0">
+                                <div class="card blog-card">
+                                    <img src="<?= base_url('blogs/thumbnail/' . $blog['thumbnail']) ?>" alt="">
+                                    <div class="card-body blog-body">
+                                        <h5 class="card-title fw-bold mb-3">
+                                            <?= esc($blog['title']) ?>
+                                        </h5>
+                                        <p class="card-text content"><?= get_introduction($blog['content']) ?></p>
+                                        <p class="card-text author my-0"><b>Last Modified&colon;</b> <?= (new DateTime($blog['updated_at']))->format('F j, Y') ?></p>
+                                        <p class="card-text last-modified my-0"><b>Author&colon;</b> <?= $blog['first_name'] . ' ' . $blog['middle_name'] . ' ' . $blog['last_name'] ?></p>
+                                    </div>
+                                    <div class="card-body d-flex">
+                                        <a class="text-decoration-none" href="<?= base_url("blogs/edit/{$blog['slug']}") ?>">
+                                            Edit
+                                        </a>
+                                        <a class="text-decoration-none ms-auto" href="<?= base_url("blogs/view/{$blog['slug']}") ?>">
+                                            Read More
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
+                <?php 
+                        }
+                    } else {
+                        echo '<tr><td class="text-danger" colspan="6">No users</td></tr>';
+                    }
+                ?>
             </div>
         </div>
         <!--end::Container-->

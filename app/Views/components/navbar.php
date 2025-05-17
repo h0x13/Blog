@@ -14,9 +14,6 @@
                     <i class="bi bi-list"></i>
                 </a>
             </li>
-            <li class="nav-item d-none d-md-block">
-                <a href="#" class="nav-link">Home</a>
-            </li>
         </ul>
         <!--end::Start Navbar Links-->
         <!--begin::End Navbar Links-->
@@ -29,55 +26,38 @@
                     data-bs-toggle="dropdown"
                 >
                     <img
-                        src="<?= base_url('assets/img/user2-160x160.jpg') ?>"
-                        class="user-image rounded-circle shadow"
+                        src="<?= base_url('assets/img/default-avatar.svg') ?>"
+                        class="user-image rounded-circle shadow border"
                         alt="User Image"
                     />
-                    <span class="d-none d-md-inline"
-                        >Alexander Pierce</span
-                    >
                 </a>
                 <ul
                     class="dropdown-menu dropdown-menu-lg dropdown-menu-end"
                 >
                     <!--begin::User Image-->
-                    <li class="user-header text-bg-primary">
+                    <li class="user-header text-bg-success">
                         <img
                             src="<?= base_url('assets/img/user2-160x160.jpg') ?>"
                             class="rounded-circle shadow"
                             alt="User Image"
                         />
                         <p>
-                            Alexander Pierce - Web Developer
-                            <small>Member since Nov. 2023</small>
+                            Alexander Pierce
+                            <small>Admin</small>
                         </p>
                     </li>
                     <!--end::User Image-->
-                    <!--begin::Menu Body-->
-                    <li class="user-body">
-                        <!--begin::Row-->
-                        <div class="row">
-                            <div class="col-4 text-center">
-                                <a href="#">Followers</a>
-                            </div>
-                            <div class="col-4 text-center">
-                                <a href="#">Sales</a>
-                            </div>
-                            <div class="col-4 text-center">
-                                <a href="#">Friends</a>
-                            </div>
-                        </div>
-                        <!--end::Row-->
-                    </li>
-                    <!--end::Menu Body-->
                     <!--begin::Menu Footer-->
-                    <li class="user-footer">
-                        <a href="#" class="btn btn-default btn-flat"
+                    <li class="user-footer d-flex justify-content-center">
+                        <a href="#" class="btn btn-secondary ms-2"
+                            ><i class="bi bi-moon-fill"></i></a
+                        >
+                        <a href="#" class="btn btn-success ms-2"
                             >Profile</a
                         >
                         <a
                             href="#"
-                            class="btn btn-default btn-flat float-end"
+                            class="btn btn-danger ms-2"
                             >Sign out</a
                         >
                     </li>

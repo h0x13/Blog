@@ -1,7 +1,7 @@
 <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
+            <div class="modal-header bg-success text-white">
                 <h5 class="modal-title" id="addUserModalLabel">Add New User</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -12,9 +12,9 @@
                     <!-- Profile Image Section -->
                     <div class="text-center mb-4">
                         <div class="position-relative d-inline-block">
-                            <img src="<?= base_url('assets/img/default-avatar.svg') ?>" id="addImagePreview" class="rounded-circle border border-3 border-primary shadow-sm" style="width: 120px; height: 120px; object-fit: cover; cursor: pointer;" onclick="document.getElementById('addImage').click()">
+                            <img src="<?= base_url('assets/img/default-avatar.svg') ?>" id="addImagePreview" class="rounded-circle border border-3 border-success shadow-sm" style="width: 120px; height: 120px; object-fit: cover; cursor: pointer;" onclick="document.getElementById('addImage').click()">
                             <input type="file" class="form-control d-none" id="addImage" name="image" accept="image/*">
-                            <button id="addUploadImageButton" type="button" class="btn btn-primary btn-sm position-absolute bottom-0 end-0 bg-primary rounded-circle px-2 py-1 shadow-sm" style="cursor: pointer; display: block;" onclick="document.getElementById('addImage').click()">
+                            <button id="addUploadImageButton" type="button" class="btn btn-success btn-sm position-absolute bottom-0 end-0 bg-success rounded-circle px-2 py-1 shadow-sm" style="cursor: pointer; display: block;" onclick="document.getElementById('addImage').click()">
                                 <i class="bi bi-camera-fill text-white"></i>
                             </button>
                             <button id="addRemoveImageButton" type="button" class="btn btn-danger btn-sm position-absolute bottom-0 end-0 rounded-circle shadow-sm" style="cursor: pointer; display: none;">
@@ -27,7 +27,7 @@
                         <!-- Personal Information Card -->
                         <div class="col-12">
                             <div class="card shadow-sm mb-3">
-                                <div class="card-header bg-light">
+                                <div class="card-header">
                                     <h6 class="mb-0">Personal Information</h6>
                                 </div>
                                 <div class="card-body">
@@ -80,7 +80,7 @@
                         <!-- Account Information Card -->
                         <div class="col-12">
                             <div class="card shadow-sm mb-3">
-                                <div class="card-header bg-light">
+                                <div class="card-header">
                                     <h6 class="mb-0">Account Information</h6>
                                 </div>
                                 <div class="card-body">
@@ -134,7 +134,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save User</button>
+                    <button type="submit" class="btn btn-success">Save User</button>
                 </div>
             </form>
         </div>
