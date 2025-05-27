@@ -47,6 +47,9 @@ CREATE TABLE blog_categories (
     FOREIGN KEY (category_id) REFERENCES categories(category_id) ON DELETE CASCADE
 );
 
+CREATE TABLE blog_reviews (
+);
+
 
 INSERT INTO users (first_name, last_name, middle_name, email, password, role)
 VALUES 

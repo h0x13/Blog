@@ -89,4 +89,38 @@
     integrity="sha256-XPpPaZlU8S/HWf7FZLAncLg2SAkP8ScUTII89x9D3lY="
     crossorigin="anonymous"
 ></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const switchThemeButtons = document.querySelectorAll('a[href="#SwitchTheme"]');
+        const theme = localStorage.getItem('data-bs-theme') || 'light';
+        document.body.setAttribute('data-bs-theme', theme);
+
+        switchThemeButtons.forEach(button => {
+            button.addEventListener('click', event => {
+                event.preventDefault();
+                const theme = document.body.getAttribute('data-bs-theme');
+                if (theme === 'light') {
+                    button.querySelector('i').classList.remove('bi-moon-fill');
+                    button.querySelector('i').classList.add('bi-sun-fill');
+                    document.body.setAttribute('data-bs-theme', 'dark')
+                    localStorage.setItem('data-bs-theme', 'dark');
+                } else {
+                    button.querySelector('i').classList.remove('bi-sun-fill');
+                    button.querySelector('i').classList.add('bi-moon-fill');
+                    document.body.setAttribute('data-bs-theme', 'light')
+                    localStorage.setItem('data-bs-theme', 'light');
+                }
+            });
+
+            const theme = document.body.getAttribute('data-bs-theme');
+            if (theme === 'light') {
+                button.querySelector('i').classList.remove('bi-moon-fill');
+                button.querySelector('i').classList.add('bi-sun-fill');
+            } else {
+                button.querySelector('i').classList.remove('bi-sun-fill');
+                button.querySelector('i').classList.add('bi-moon-fill');
+            }
+        });
+    });
+</script>
 <!--end::Script-->

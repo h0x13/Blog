@@ -29,6 +29,7 @@ class Blog extends BaseController
     public function index()
     {
         helper('get_introduction');
+        helper('url');
 
         $data = [
             'blogs' => $this->blogModel
@@ -40,9 +41,41 @@ class Blog extends BaseController
         return view('blogs', $data);
     }
 
+    public function popular()
+    {
+        helper('get_introduction');
+        helper('url');
+
+        $data = [
+            'blogs' => $this->blogModel
+                ->select('blogs.*, users.first_name, users.last_name, users.middle_name')
+                ->join('users', 'users.user_id = blogs.user_id')
+                ->findAll(),
+            'validation' => $this->validation
+        ];
+        return view('popular_blogs', $data);
+    }
+
+    public function manage()
+    {
+        helper('get_introduction');
+        helper('url');
+
+        $data = [
+            'blogs' => $this->blogModel
+                ->select('blogs.*, users.first_name, users.last_name, users.middle_name')
+                ->join('users', 'users.user_id = blogs.user_id')
+                ->findAll(),
+            'validation' => $this->validation
+        ];
+        return view('manage_blogs', $data);
+    }
+
     public function view($slug)
     {
         helper('reading');
+        helper('url');
+
         $blog = $this->blogModel->where('slug', $slug)->first();
         
         if (!$blog) {
@@ -69,6 +102,8 @@ class Blog extends BaseController
     }
 
     public function create() {
+        helper('url');
+
         $data['categories'] = $this->categoryModel->findAll();
         return view('blog_pages/add.php', $data);
     } 
@@ -135,6 +170,8 @@ class Blog extends BaseController
     }
 
     public function update($slug) {
+        helper('url');
+
         $categories = $this->categoryModel->findAll();
         $blog = $this->blogModel->where('slug', $slug)->first();
 

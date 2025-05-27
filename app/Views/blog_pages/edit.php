@@ -1,4 +1,4 @@
-<?= $this->extend('templates/base') ?>
+<?= $this->extend('templates/regular_user/base') ?>
 
 <?= $this->section('title') ?>Edit Blog<?= $this->endSection() ?>
 
@@ -62,7 +62,7 @@
                 <div class="col-md-12">
                     <div class="d-flex justify-content-between align-items-center">
                         <h2 class="m-0">Edit Blog</h2>
-                        <a href="<?= base_url('blogs') ?>" class="btn btn-secondary">
+                        <a href="<?= base_url('blogs/manage') ?>" class="btn btn-secondary">
                             <i class="bi bi-arrow-left"></i> Back to Blogs
                         </a>
                     </div>

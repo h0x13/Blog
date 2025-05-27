@@ -40,3 +40,9 @@
     integrity="sha256-+uGLJmmTKOqBr+2E6KDYs/NRsHxSkONXFHUL0fy2O/4="
     crossorigin="anonymous"
 />
+<script>
+  (function() {
+    const theme = localStorage.getItem('data-bs-theme') || 'light'; // Default to light
+    document.documentElement.setAttribute('data-bs-theme', theme);
+  })();
+</script>

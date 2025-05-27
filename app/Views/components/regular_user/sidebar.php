@@ -13,7 +13,7 @@ function isActivePage($page) {
     <!--begin::Sidebar Brand-->
     <div class="sidebar-brand">
         <!--begin::Brand Link-->
-        <a href="/" class="brand-link d-flex justify-content-center align-items-center">
+        <a href="#" class="brand-link d-flex justify-content-center align-items-center">
             <!--begin::Brand Text-->
             <span class="brand-text fw-bold">BlogHub</span>
             <!--end::Brand Text-->
@@ -32,26 +32,34 @@ function isActivePage($page) {
                 data-accordion="false">
                 <li class="nav-item">
                     <a
-                        href="/dashboard"
-                        class="nav-link <?php isActivePage('dashboard') ?>">
-                        <i class="nav-icon bi bi-speedometer"></i>
-                        <p>Dashboard</p>
+                        href="/blogs"
+                        class="nav-link <?php isActivePage('blogs') ?>">
+                        <i class="nav-icon bi bi-house-door"></i>
+                        <p>Home</p>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a
-                        href="/users"
-                        class="nav-link <?php isActivePage('users') ?>">
-                        <i class="nav-icon bi bi-people"></i>
-                        <p>Manage Users</p>
+                        href="#"
+                        class="nav-link <?php isActivePage('popular') ?>">
+                        <i class="nav-icon bi bi-graph-up"></i>
+                        <p>Popular</p>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a
-                        href="/categories"
-                        class="nav-link <?php isActivePage('categories') ?>">
-                        <i class="nav-icon bi bi-tags"></i>
-                        <p>Manage Categories</p>
+                        href="/blogs/manage"
+                        class="nav-link <?php isActivePage('manage') ?>">
+                        <i class="nav-icon bi bi-journal-text"></i>
+                        <p>Your Blogs</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a
+                        href="#"
+                        class="nav-link <?php isActivePage('saves') ?>">
+                        <i class="nav-icon bi bi-bookmark-star"></i>
+                        <p>Saves</p>
                     </a>
                 </li>
             </ul>

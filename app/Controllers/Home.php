@@ -21,7 +21,8 @@ class Home extends BaseController
     
     public function index(): string
     {
-        return view('index');
+        $data = ['categories' => $this->categoryModel->findAll()];
+        return view('index', $data);
     }
 
     public function about()
@@ -38,5 +39,15 @@ class Home extends BaseController
             'unpublished_blogs_count' => $this->blogModel->where('visibility', 'private')->countAllResults(),
         ];
         return view('dashboard', $data);
+    }
+
+    public function register() 
+    {
+        return view('register');
+    }
+
+    public function login() 
+    {
+        return view('login');
     }
 }

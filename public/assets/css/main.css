@@ -1841,9 +1841,11 @@ section,
   color: var(--accent-color);
 }
 
-/*--------------------------------------------------------------
-# Starter Section Section
---------------------------------------------------------------*/
-.starter-section {
-  /* Add your styles here */
+.user-form {
+    min-height: 100vh;
+}
+
+.form-container {
+  background-color: #ffffff;
+  color: #28323a;
 }

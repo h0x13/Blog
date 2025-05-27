@@ -14,6 +14,14 @@ Blogs
         <div class="container-fluid">
             <!--begin::Row-->
             <div class="row">
+                <div class="col-sm-6">
+                    <h3 class="mb-0">Manage Your Blogs</h3>
+                </div>
+                <div class="col-sm-6 text-end">
+                    <a href="<?= base_url('blogs/add') ?>" class="btn btn-success">
+                        <i class="bi bi-plus-lg"></i> Add Blog Post
+                    </a>
+                </div>
             </div>
             <!--end::Row-->
         </div>
@@ -44,6 +52,9 @@ Blogs
                                         <p class="card-text last-modified my-0"><b>Author&colon;</b> <?= $blog['first_name'] . ' ' . $blog['middle_name'] . ' ' . $blog['last_name'] ?></p>
                                     </div>
                                     <div class="card-body d-flex">
+                                        <a class="text-decoration-none" href="<?= base_url("blogs/edit/{$blog['slug']}") ?>">
+                                            Edit
+                                        </a>
                                         <a class="text-decoration-none ms-auto" href="<?= base_url("blogs/view/{$blog['slug']}") ?>">
                                             Read More
                                         </a>

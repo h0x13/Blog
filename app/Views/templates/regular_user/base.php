@@ -26,9 +26,9 @@
         <!--begin::App Wrapper-->
         <div class="app-wrapper">
 
-            <?= $this->include('components/navbar') ?>
+            <?= $this->include('components/regular_user/navbar') ?>
 
-            <?= $this->include('components/sidebar') ?>
+            <?= $this->include('components/regular_user/sidebar') ?>
 
             <?= $this->renderSection('content') ?>
 

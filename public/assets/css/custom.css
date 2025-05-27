@@ -46,3 +46,17 @@ body * {
   background-color: transparent;
   font-size: 1rem;
 }
+
+a.category-badge {
+    cursor: pointer;
+}
+
+a.category-badge:hover {
+  background: linear-gradient(var(--bs-body-bg), var(--bs-body-bg)) padding-box,
+               linear-gradient(to right, #008aff, #712ee5) border-box;
+  color: #008aff;
+}
+
+.text-adaptive {
+    color: var(--bs-body-color);
+}
