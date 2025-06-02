@@ -53,7 +53,7 @@
                             </div>
                         </li>
                         <li class="list-group-item">
-                            <a href="#" class="text-decoration-none text-adaptive d-block w-100">
+                            <a href="<?= base_url('profile') ?>" class="text-decoration-none text-adaptive d-block w-100">
                                 <i class="bi bi-person-circle me-2"></i> Profile
                             </a>
                         </li>

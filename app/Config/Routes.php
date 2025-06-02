@@ -16,6 +16,7 @@ $routes->get('/login', [Home::class, 'login']);
 $routes->get('/about', [Home::class, 'about']);
 $routes->get('/dashboard', [Home::class, 'dashboard']);
 $routes->get('user-image/(:segment)', [Image::class, 'image/$1']);
+$routes->get('/profile', [User::class, 'profile']);
 
 // User routes
 $routes->group('users', function($routes) {

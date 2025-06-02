@@ -163,4 +163,14 @@ class User extends BaseController
             ->with('message', $message)
             ->with('message_type', $messageType);
     }
+    
+    public function profile() 
+    {
+        $id = 2;
+        $user = $this->userModel->find($id);
+        if (!$user) {
+            throw PageNotFoundException::forPageNotFound();
+        }
+        return view('profile', $user);
+    }
 }
