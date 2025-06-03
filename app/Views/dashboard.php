@@ -118,81 +118,90 @@ Dashboard
               <div class="col-lg-7 connectedSortable">
                 <div class="card mb-4">
                   <div class="card-header"><h3 class="card-title">Active Users</h3></div>
-                  <div class="card-body"><div id="revenue-chart"></div></div>
+                  <div class="card-body">
+                    <?php if (!empty($active_users)): ?>
+                      <div class="table-responsive">
+                        <table class="table table-hover">
+                          <thead>
+                            <tr>
+                              <th>Name</th>
+                              <th>Email</th>
+                              <th>Last Activity</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <?php foreach ($active_users as $user): ?>
+                              <tr>
+                                <td><?= $user['first_name'] ?> <?= $user['last_name'] ?></td>
+                                <td><?= $user['email'] ?></td>
+                                <td><?= (new DateTime($user['last_activity']))->format('F j, Y g:i A') ?></td>
+                              </tr>
+                            <?php endforeach; ?>
+                          </tbody>
+                        </table>
+                      </div>
+                    <?php else: ?>
+                      <div class="text-center py-4">
+                        <p class="text-muted mb-0">No active users in the last 24 hours.</p>
+                      </div>
+                    <?php endif; ?>
+                  </div>
                 </div>
                 <!-- /.card -->
               </div>
 
               <div class="col-md-5">
                 <div class="card mb-4">
-                  <div class="card-header"><h3 class="card-title">Bordered Table</h3></div>
+                  <div class="card-header"><h3 class="card-title">Recent Activities</h3></div>
                   <!-- /.card-header -->
                   <div class="card-body">
-                    <table class="table table-bordered">
-                      <thead>
-                        <tr>
-                          <th style="width: 10px">#</th>
-                          <th>Task</th>
-                          <th>Progress</th>
-                          <th style="width: 40px">Label</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr class="align-middle">
-                          <td>1.</td>
-                          <td>Update software</td>
-                          <td>
-                            <div class="progress progress-xs">
-                              <div
-                                class="progress-bar progress-bar-danger"
-                                style="width: 55%"
-                              ></div>
-                            </div>
-                          </td>
-                          <td><span class="badge text-bg-danger">55%</span></td>
-                        </tr>
-                        <tr class="align-middle">
-                          <td>2.</td>
-                          <td>Clean database</td>
-                          <td>
-                            <div class="progress progress-xs">
-                              <div class="progress-bar text-bg-warning" style="width: 70%"></div>
-                            </div>
-                          </td>
-                          <td><span class="badge text-bg-warning">70%</span></td>
-                        </tr>
-                        <tr class="align-middle">
-                          <td>3.</td>
-                          <td>Cron job running</td>
-                          <td>
-                            <div class="progress progress-xs progress-striped active">
-                              <div class="progress-bar text-bg-primary" style="width: 30%"></div>
-                            </div>
-                          </td>
-                          <td><span class="badge text-bg-primary">30%</span></td>
-                        </tr>
-                        <tr class="align-middle">
-                          <td>4.</td>
-                          <td>Fix and squish bugs</td>
-                          <td>
-                            <div class="progress progress-xs progress-striped active">
-                              <div class="progress-bar text-bg-success" style="width: 90%"></div>
-                            </div>
-                          </td>
-                          <td><span class="badge text-bg-success">90%</span></td>
-                        </tr>
-                      </tbody>
-                    </table>
+                    <?php if (!empty($recent_activities)): ?>
+                      <table class="table table-bordered">
+                        <thead>
+                          <tr>
+                            <th style="width: 10px">#</th>
+                            <th>User</th>
+                            <th>Action</th>
+                            <th>Time</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <?php foreach ($recent_activities as $index => $activity): ?>
+                            <tr class="align-middle">
+                              <td><?= $index + 1 ?></td>
+                              <td><?= $activity['first_name'] ?> <?= $activity['last_name'] ?></td>
+                              <td>
+                                <?php
+                                $actionIcon = match($activity['action_type']) {
+                                    'blog_create' => 'bi-file-earmark-plus',
+                                    'blog_update' => 'bi-pencil',
+                                    'blog_delete' => 'bi-trash',
+                                    'blog_like' => 'bi-hand-thumbs-up',
+                                    'blog_dislike' => 'bi-hand-thumbs-down',
+                                    'comment_create' => 'bi-chat',
+                                    'comment_reply' => 'bi-reply',
+                                    'login' => 'bi-box-arrow-in-right',
+                                    'logout' => 'bi-box-arrow-right',
+                                    default => 'bi-activity'
+                                };
+                                ?>
+                                <i class="bi <?= $actionIcon ?> me-2"></i>
+                                <?= ucwords(str_replace('_', ' ', $activity['action_type'])) ?>
+                              </td>
+                              <td><?= (new DateTime($activity['created_at']))->format('g:i A') ?></td>
+                            </tr>
+                          <?php endforeach; ?>
+                        </tbody>
+                      </table>
+                    <?php else: ?>
+                      <div class="text-center py-4">
+                        <p class="text-muted mb-0">No recent activities found.</p>
+                      </div>
+                    <?php endif; ?>
                   </div>
                   <!-- /.card-body -->
                   <div class="card-footer clearfix">
-                    <ul class="pagination pagination-sm m-0 float-end">
-                      <li class="page-item"><a class="page-link" href="#">&laquo;</a></li>
-                      <li class="page-item"><a class="page-link" href="#">1</a></li>
-                      <li class="page-item"><a class="page-link" href="#">2</a></li>
-                      <li class="page-item"><a class="page-link" href="#">3</a></li>
-                      <li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
-                    </ul>
+                    <a href="/admin/audit-logs" class="btn btn-sm btn-primary float-end">View All Activities</a>
                   </div>
                 </div>
               </div>

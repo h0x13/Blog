@@ -26,7 +26,7 @@
         <!--begin::App Wrapper-->
         <div class="app-wrapper">
 
-            <?php if (session()->get('role') === 'admin'): ?>
+            <?php if (session()->get('user_role') === 'admin'): ?>
             <?= $this->include('components/navbar') ?>
             <?= $this->include('components/sidebar') ?>
             <?php else: ?>

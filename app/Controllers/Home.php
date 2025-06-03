@@ -49,11 +49,30 @@ class Home extends BaseController
                 ->with('error', 'You do not have permission to access this page.');
         }
 
+        // Get active users (users who have logged in within the last 24 hours)
+        $auditLogModel = new \App\Models\AuditLogModel();
+        $activeUsers = $auditLogModel->select('users.*, audit_logs.created_at as last_activity')
+            ->join('users', 'users.user_id = audit_logs.user_id')
+            ->where('audit_logs.action_type', 'login')
+            ->where('audit_logs.created_at >=', date('Y-m-d H:i:s', strtotime('-24 hours')))
+            ->groupBy('users.user_id')
+            ->orderBy('audit_logs.created_at', 'DESC')
+            ->findAll();
+
+        // Get recent activities for the bordered table
+        $recentActivities = $auditLogModel->select('audit_logs.*, users.first_name, users.last_name')
+            ->join('users', 'users.user_id = audit_logs.user_id')
+            ->orderBy('audit_logs.created_at', 'DESC')
+            ->limit(5)
+            ->findAll();
+
         $data = [
             'users_count' => $this->userModel->countAllResults(),
             'categories_count' => $this->categoryModel->countAllResults(),
             'published_blogs_count' => $this->blogModel->where('visibility', 'public')->countAllResults(),
             'unpublished_blogs_count' => $this->blogModel->where('visibility', 'private')->countAllResults(),
+            'active_users' => $activeUsers,
+            'recent_activities' => $recentActivities
         ];
         return view('dashboard', $data);
     }
@@ -171,6 +190,16 @@ class Home extends BaseController
             'user_role' => $userData['role']
         ]);
 
+        // Log login action
+        $auditLogModel = new \App\Models\AuditLogModel();
+        $auditLogModel->logUserAction(
+            $userData['user_id'],
+            'login',
+            'user',
+            null,
+            'User logged in'
+        );
+
         // Redirect based on role
         if ($userData['role'] === 'admin') {
             return redirect()->to('/dashboard');
@@ -181,9 +210,20 @@ class Home extends BaseController
 
     public function logout()
     {
+        if (session()->get('isLoggedIn')) {
+            // Log logout action before destroying session
+            $auditLogModel = new \App\Models\AuditLogModel();
+            $auditLogModel->logUserAction(
+                session()->get('user_id'),
+                'logout',
+                'user',
+                null,
+                'User logged out'
+            );
+        }
+
         session()->destroy();
-        return redirect()->to('/login')
-            ->with('success', 'You have been successfully logged out.');
+        return redirect()->to('/login');
     }
 
     public function forgotPassword()

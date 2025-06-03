@@ -79,6 +79,7 @@ Users
                                                         </td>
                                                         <td><?= date('d-m-Y H:i:s', strtotime($row['updated_at'])) ?></td>
                                                         <td>
+                                                            <?php if ($row['user_id'] != session()->get('user_id')): ?>
                                                             <!-- Edit Button -->
                                                             <button class="btn btn-sm btn-success edit-btn"
                                                                 data-id="<?= $row['user_id'] ?>"
@@ -105,6 +106,9 @@ Users
                                                                 data-bs-target="#deleteModal">
                                                                 <i class="bi bi-trash"></i> Delete
                                                             </button>
+                                                            <?php else: ?>
+                                                            <span class="text-muted">Current Account</span>
+                                                            <?php endif; ?>
                                                         </td>
                                                     </tr>
                                         <?php 

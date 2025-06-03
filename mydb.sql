@@ -111,17 +111,85 @@ CREATE TABLE comment_reactions (
     UNIQUE KEY unique_comment_user_reaction (comment_id, user_id)
 );
 
-CREATE TABLE notifications (
-    notification_id INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE audit_logs (
+    audit_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    message TEXT NOT NULL,
-    type VARCHAR(50) NOT NULL,
-    reference_id INT,
-    is_read BOOLEAN NOT NULL DEFAULT FALSE,
+    action_type ENUM('blog_create', 'blog_update', 'blog_delete', 'blog_like', 'blog_dislike', 'comment_create', 'comment_reply', 'login', 'logout') NOT NULL,
+    entity_type ENUM('blog', 'comment', 'reply', 'user') NOT NULL,
+    entity_id INT,
+    details TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
+
+-- Create triggers for blog operations
+DELIMITER //
+
+CREATE TRIGGER after_blog_insert
+AFTER INSERT ON blogs
+FOR EACH ROW
+BEGIN
+    INSERT INTO audit_logs (user_id, action_type, entity_type, entity_id, details)
+    VALUES (NEW.user_id, 'blog_create', 'blog', NEW.blog_id, CONCAT('Created blog: ', NEW.title, ' (', NEW.slug, ')'));
+END//
+
+CREATE TRIGGER after_blog_update
+AFTER UPDATE ON blogs
+FOR EACH ROW
+BEGIN
+    INSERT INTO audit_logs (user_id, action_type, entity_type, entity_id, details)
+    VALUES (NEW.user_id, 'blog_update', 'blog', NEW.blog_id, CONCAT('Updated blog: ', NEW.title, ' (', NEW.slug, ')'));
+END//
+
+CREATE TRIGGER after_blog_delete
+AFTER DELETE ON blogs
+FOR EACH ROW
+BEGIN
+    INSERT INTO audit_logs (user_id, action_type, entity_type, entity_id, details)
+    VALUES (OLD.user_id, 'blog_delete', 'blog', OLD.blog_id, CONCAT('Deleted blog: ', OLD.title, ' (', OLD.slug, ')'));
+END//
+
+CREATE TRIGGER after_blog_reaction_insert
+AFTER INSERT ON blog_reactions
+FOR EACH ROW
+BEGIN
+    DECLARE blog_slug VARCHAR(255);
+    SELECT slug INTO blog_slug FROM blogs WHERE blog_id = NEW.blog_id;
+    
+    INSERT INTO audit_logs (user_id, action_type, entity_type, entity_id, details)
+    VALUES (NEW.user_id, 
+            CASE WHEN NEW.reaction_type = 'like' THEN 'blog_like' ELSE 'blog_dislike' END,
+            'blog', 
+            NEW.blog_id,
+            CONCAT(CASE WHEN NEW.reaction_type = 'like' THEN 'Liked' ELSE 'Disliked' END, ' blog: ', blog_slug));
+END//
+
+CREATE TRIGGER after_comment_insert
+AFTER INSERT ON comments
+FOR EACH ROW
+BEGIN
+    DECLARE blog_slug VARCHAR(255);
+    SELECT slug INTO blog_slug FROM blogs WHERE blog_id = NEW.blog_id;
+    
+    INSERT INTO audit_logs (user_id, action_type, entity_type, entity_id, details)
+    VALUES (NEW.user_id, 'comment_create', 'comment', NEW.comment_id, CONCAT('Commented on blog: ', blog_slug));
+END//
+
+CREATE TRIGGER after_comment_reply_insert
+AFTER INSERT ON comment_replies
+FOR EACH ROW
+BEGIN
+    DECLARE blog_slug VARCHAR(255);
+    SELECT b.slug INTO blog_slug 
+    FROM comments c 
+    JOIN blogs b ON c.blog_id = b.blog_id 
+    WHERE c.comment_id = NEW.comment_id;
+    
+    INSERT INTO audit_logs (user_id, action_type, entity_type, entity_id, details)
+    VALUES (NEW.user_id, 'comment_reply', 'reply', NEW.reply_id, CONCAT('Replied to a comment on blog: ', blog_slug));
+END//
+
+DELIMITER ;
 
 INSERT INTO users (first_name, last_name, middle_name, email, password, role)
 VALUES 

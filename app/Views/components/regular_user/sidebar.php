@@ -56,10 +56,10 @@ function isActivePage($page) {
                 </li>
                 <li class="nav-item">
                     <a
-                        href="/notifications"
-                        class="nav-link <?php isActivePage('notifications') ?>">
-                        <i class="nav-icon bi bi-bell"></i>
-                        <p>Notifications</p>
+                        href="/audit-logs"
+                        class="nav-link <?php isActivePage('audit-logs') ?>">
+                        <i class="nav-icon bi bi-activity"></i>
+                        <p>Activity Log</p>
                     </a>
                 </li>
             </ul>

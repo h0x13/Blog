@@ -78,6 +78,13 @@ class User extends BaseController
 
     public function edit($id)
     {
+        // Prevent editing current admin account
+        if ($id == session()->get('user_id')) {
+            return redirect()->to('/users')
+                ->with('message', 'You cannot edit your own account from here. Please use the profile page instead.')
+                ->with('message_type', 'warning');
+        }
+
         if (!$this->validate([
             'first_name' => 'required|min_length[2]|max_length[50]',
             'last_name' => 'required|min_length[2]|max_length[50]',
@@ -161,6 +168,13 @@ class User extends BaseController
 
     public function delete($id)
     {
+        // Prevent deleting current admin account
+        if ($id == session()->get('user_id')) {
+            return redirect()->to('/users')
+                ->with('message', 'You cannot delete your own account.')
+                ->with('message_type', 'warning');
+        }
+
         $user = $this->userModel->find($id);
         if (!$user) {
             throw PageNotFoundException::forPageNotFound();

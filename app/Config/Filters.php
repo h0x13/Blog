@@ -114,16 +114,20 @@ class Filters extends BaseFilters
                 'blogs/add',
                 'blogs/edit/*',
                 'blogs/delete/*',
+                'profile',
+                'profile/update',
+                'audit-logs'
             ]
         ],
         'admin' => [
             'before' => [
+                'dashboard',
+                'dashboard/*',
                 'users',
                 'users/*',
                 'categories',
                 'categories/*',
-                'dashboard',
-                'dashboard/*',
+                'admin/audit-logs'
             ]
         ],
         'noauth' => [
@@ -132,7 +136,7 @@ class Filters extends BaseFilters
                 'register',
                 'forgot-password',
                 'reset-password/*',
-                'verification-pending',
+                'verification-pending'
             ]
         ]
     ];

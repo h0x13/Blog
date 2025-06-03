@@ -26,8 +26,9 @@ class AuthFilter implements FilterInterface
                 return redirect()->to('/login')->with('error', 'Your account no longer exists.');
             }
 
-            if (!$user['is_enabled'] && $request->uri->getPath() !== 'resend-verification') {
-                return redirect()->to('/dashboard')->with('warning', 'Please verify your email address first.');
+            // If user is not verified and not on verification page
+            if (!$user['is_enabled'] && trim($request->getUri()->getPath(), '/') !== 'resend-verification') {
+                return redirect()->to('/verification-pending')->with('warning', 'Please verify your email address first.');
             }
         }
     }
