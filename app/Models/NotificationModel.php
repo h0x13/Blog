@@ -13,9 +13,9 @@ class NotificationModel extends Model
     protected $useSoftDeletes = false;
     protected $allowedFields = [
         'user_id',
+        'message',
         'type',
         'reference_id',
-        'message',
         'is_read',
         'created_at'
     ];
@@ -24,42 +24,11 @@ class NotificationModel extends Model
     protected $createdField = 'created_at';
     protected $updatedField = 'updated_at';
 
-    public function createNotification($userId, $type, $referenceId, $message)
-    {
-        return $this->insert([
-            'user_id' => $userId,
-            'type' => $type,
-            'reference_id' => $referenceId,
-            'message' => $message,
-            'is_read' => false
-        ]);
-    }
-
-    public function getUserNotifications($userId, $limit = 20)
-    {
-        return $this->where('user_id', $userId)
-                    ->orderBy('created_at', 'DESC')
-                    ->limit($limit)
-                    ->findAll();
-    }
-
-    public function markAsRead($notificationId)
-    {
-        return $this->update($notificationId, ['is_read' => true]);
-    }
-
-    public function markAllAsRead($userId)
-    {
-        return $this->where('user_id', $userId)
-                    ->where('is_read', false)
-                    ->set(['is_read' => true])
-                    ->update();
-    }
-
-    public function getUnreadCount($userId)
-    {
-        return $this->where('user_id', $userId)
-                    ->where('is_read', false)
-                    ->countAllResults();
-    }
+    protected $validationRules = [
+        'user_id' => 'required|numeric',
+        'message' => 'required|string',
+        'type' => 'required|string',
+        'reference_id' => 'permit_empty|numeric',
+        'is_read' => 'required|boolean'
+    ];
 } 

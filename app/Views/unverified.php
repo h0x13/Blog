@@ -1,4 +1,4 @@
-<?= $this->extend('templates/regular_user/base.php') ?>
+<?= $this->extend('layouts/main') ?>
 
 <?= $this->section('content') ?>
 <div class="container py-4">

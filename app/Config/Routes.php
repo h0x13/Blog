@@ -6,8 +6,7 @@ use App\Controllers\Image;
 use App\Controllers\User;
 use App\Controllers\Category;
 use App\Controllers\VerificationController;
-use App\Controllers\Notification;
-use App\Controllers\AuditLogController;
+use App\Controllers\NotificationController;
 use CodeIgniter\Router\RouteCollection;
 
 /**
@@ -20,8 +19,9 @@ $routes->get('/verification-pending', [Home::class, 'verificationPending']);
 $routes->get('/login', [Home::class, 'login']);
 $routes->get('/about', [Home::class, 'about']);
 $routes->get('/dashboard', [Home::class, 'dashboard']);
-$routes->get('user-image/(:segment)', [Image::class, 'image/$1']);
+$routes->get('/user-image/(:segment)', [Image::class, 'image/$1']);
 $routes->get('/profile', [User::class, 'profile']);
+$routes->post('profile/update', [User::class, 'updateProfile']);
 
 // Verification routes
 $routes->get('verify-email/(:segment)', [VerificationController::class, 'verify/$1']);
@@ -83,15 +83,9 @@ $routes->post('forgot-password', 'Home::processForgotPassword');
 $routes->get('reset-password/(:segment)', 'Home::resetPassword/$1');
 $routes->post('reset-password', 'Home::processResetPassword');
 
-// Notification routes
-$routes->group('notifications', function($routes) {
-    $routes->get('/', [Notification::class, 'index']);
-    $routes->post('mark-read/(:num)', [Notification::class, 'markAsRead/$1']);
-    $routes->post('mark-all-read', [Notification::class, 'markAllAsRead']);
-    $routes->get('unread-count', [Notification::class, 'getUnreadCount']);
-});
-
-// Audit Logs Routes
-$routes->get('audit-logs', 'AuditLogController::index');
-$routes->get('audit-logs/export', 'AuditLogController::export');
+// Notification Routes
+$routes->get('notifications', 'NotificationController::index');
+$routes->post('notifications/mark-as-read/(:num)', 'NotificationController::markAsRead/$1');
+$routes->post('notifications/mark-all-as-read', 'NotificationController::markAllAsRead');
+$routes->get('notifications/unread-count', 'NotificationController::getUnreadCount');
 

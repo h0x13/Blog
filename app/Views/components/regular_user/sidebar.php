@@ -46,24 +46,22 @@ function isActivePage($page) {
                         <p>Popular</p>
                     </a>
                 </li>
-                <?php if (session()->get('isLoggedIn'))) { ?>
-                    <li class="nav-item">
-                        <a
-                            href="/blogs/manage"
-                            class="nav-link <?php isActivePage('manage') ?>">
-                            <i class="nav-icon bi bi-journal-text"></i>
-                            <p>Your Blogs</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a
-                            href="/notifications"
-                            class="nav-link <?php isActivePage('notifications') ?>">
-                            <i class="nav-icon bi bi-bell"></i>
-                            <p>Notifications</p>
-                        </a>
-                    </li>
-                <?php } ?>
+                <li class="nav-item">
+                    <a
+                        href="/blogs/manage"
+                        class="nav-link <?php isActivePage('manage') ?>">
+                        <i class="nav-icon bi bi-journal-text"></i>
+                        <p>Your Blogs</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a
+                        href="/notifications"
+                        class="nav-link <?php isActivePage('notifications') ?>">
+                        <i class="nav-icon bi bi-bell"></i>
+                        <p>Notifications</p>
+                    </a>
+                </li>
             </ul>
             <!--end::Sidebar Menu-->
         </nav>

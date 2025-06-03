@@ -11,8 +11,6 @@ use App\Models\CommentModel;
 use App\Models\CommentReplyModel;
 use App\Models\BlogReactionModel;
 use App\Models\CommentReactionModel;
-use App\Models\NotificationModel;
-use App\Models\AuditLogModel;
 use CodeIgniter\Exceptions\PageNotFoundException;
 
 class Blog extends BaseController
@@ -26,8 +24,6 @@ class Blog extends BaseController
     protected $commentReplyModel;
     protected $blogReactionModel;
     protected $commentReactionModel;
-    protected $notificationModel;
-    protected $auditLogModel;
 
     public function __construct()
     {
@@ -39,8 +35,6 @@ class Blog extends BaseController
         $this->commentReplyModel = model(CommentReplyModel::class);
         $this->blogReactionModel = model(BlogReactionModel::class);
         $this->commentReactionModel = model(CommentReactionModel::class);
-        $this->notificationModel = model(NotificationModel::class);
-        $this->auditLogModel = model(AuditLogModel::class);
         $this->validation = \Config\Services::validation();
     }
 
@@ -49,28 +43,44 @@ class Blog extends BaseController
         helper('get_introduction');
         helper('url');
 
-        $perPage = 12; // Number of blogs per page
-        $page = $this->request->getGet('page') ?? 1;
-        $offset = ($page - 1) * $perPage;
+        $db = \Config\Database::connect();
+        $builder = $db->table('blogs b');
+        $builder->select('b.*, u.first_name, u.middle_name, u.last_name');
+        $builder->join('users u', 'u.user_id = b.user_id');
+        $builder->orderBy('b.created_at', 'DESC');
 
-        $totalBlogs = $this->blogModel->countAllResults();
-        $totalPages = ceil($totalBlogs / $perPage);
+        // Get total count for pagination
+        $total = $builder->countAllResults(false);
+        
+        // Set up pagination
+        $perPage = 12;
+        $currentPage = $this->request->getGet('page') ?? 1;
+        $offset = ($currentPage - 1) * $perPage;
 
-        $data = [
-            'blogs' => $this->blogModel
-                ->select('blogs.*, users.first_name, users.last_name, users.middle_name')
-                ->join('users', 'users.user_id = blogs.user_id')
-                ->orderBy('blogs.created_at', 'DESC')
-                ->limit($perPage, $offset)
-                ->findAll(),
-            'categories' => $this->categoryModel->findAll(),
-            'validation' => $this->validation,
-            'currentPage' => $page,
-            'totalPages' => $totalPages,
-            'hasNextPage' => $page < $totalPages,
-            'hasPrevPage' => $page > 1
-        ];
-        return view('blogs', $data);
+        // Reset query and rebuild for paginated results
+        $builder->resetQuery();
+        $builder->select('b.*, u.first_name, u.middle_name, u.last_name');
+        $builder->join('users u', 'u.user_id = b.user_id');
+        $builder->orderBy('b.created_at', 'DESC');
+        $builder->limit($perPage, $offset);
+        $blogs = $builder->get()->getResultArray();
+
+        // Create pager
+        $pager = service('pager');
+        $pager->setPath('blogs');
+        $pager->makeLinks($perPage, $perPage, $total, 'default_full');
+
+        // Get categories for the filter
+        $categoryModel = new \App\Models\CategoryModel();
+        $categories = $categoryModel->findAll();
+
+        return view('blogs', [
+            'blogs' => $blogs,
+            'categories' => $categories,
+            'type' => 'recent',
+            'pager' => $pager,
+            'currentPage' => $currentPage
+        ]);
     }
 
     public function popular()
@@ -78,35 +88,68 @@ class Blog extends BaseController
         helper('get_introduction');
         helper('url');
 
-        $perPage = 12; // Number of blogs per page
-        $page = $this->request->getGet('page') ?? 1;
-        $offset = ($page - 1) * $perPage;
+        $db = \Config\Database::connect();
+        $builder = $db->table('blogs b');
+        
+        // Build the popularity score calculation
+        $builder->select('
+            b.*, 
+            u.first_name, 
+            u.middle_name, 
+            u.last_name,
+            COALESCE(COUNT(DISTINCT c.comment_id), 0) as comment_count,
+            COALESCE(COUNT(DISTINCT br.reaction_id), 0) as reaction_count,
+            (COALESCE(COUNT(DISTINCT c.comment_id), 0) + COALESCE(COUNT(DISTINCT br.reaction_id), 0)) as popularity_score
+        ');
+        $builder->join('users u', 'u.user_id = b.user_id');
+        $builder->join('comments c', 'c.blog_id = b.blog_id', 'left');
+        $builder->join('blog_reactions br', 'br.blog_id = b.blog_id', 'left');
+        $builder->groupBy('b.blog_id, u.first_name, u.middle_name, u.last_name');
+        $builder->orderBy('popularity_score', 'DESC');
 
-        // Get total count of blogs
-        $totalBlogs = $this->blogModel->countAllResults();
-        $totalPages = ceil($totalBlogs / $perPage);
+        // Get total count for pagination
+        $total = $builder->countAllResults(false);
+        
+        // Set up pagination
+        $perPage = 12;
+        $currentPage = $this->request->getGet('page') ?? 1;
+        $offset = ($currentPage - 1) * $perPage;
 
-        // Get blogs with their reaction counts
-        $blogs = $this->blogModel
-            ->select('blogs.*, users.first_name, users.last_name, users.middle_name, 
-                     (SELECT COUNT(*) FROM blog_reactions WHERE blog_reactions.blog_id = blogs.blog_id AND blog_reactions.reaction_type = "like") as like_count,
-                     (SELECT COUNT(*) FROM blog_reactions WHERE blog_reactions.blog_id = blogs.blog_id AND blog_reactions.reaction_type = "dislike") as dislike_count')
-            ->join('users', 'users.user_id = blogs.user_id')
-            ->orderBy('like_count', 'DESC')
-            ->orderBy('blogs.created_at', 'DESC')
-            ->limit($perPage, $offset)
-            ->findAll();
+        // Reset query and rebuild for paginated results
+        $builder->resetQuery();
+        $builder->select('
+            b.*, 
+            u.first_name, 
+            u.middle_name, 
+            u.last_name,
+            COALESCE(COUNT(DISTINCT c.comment_id), 0) as comment_count,
+            COALESCE(COUNT(DISTINCT br.reaction_id), 0) as reaction_count,
+            (COALESCE(COUNT(DISTINCT c.comment_id), 0) + COALESCE(COUNT(DISTINCT br.reaction_id), 0)) as popularity_score
+        ');
+        $builder->join('users u', 'u.user_id = b.user_id');
+        $builder->join('comments c', 'c.blog_id = b.blog_id', 'left');
+        $builder->join('blog_reactions br', 'br.blog_id = b.blog_id', 'left');
+        $builder->groupBy('b.blog_id, u.first_name, u.middle_name, u.last_name');
+        $builder->orderBy('popularity_score', 'DESC');
+        $builder->limit($perPage, $offset);
+        $blogs = $builder->get()->getResultArray();
 
-        $data = [
+        // Create pager
+        $pager = service('pager');
+        $pager->setPath('blogs/popular');
+        $pager->makeLinks($perPage, $perPage, $total, 'default_full');
+
+        // Get categories for the filter
+        $categoryModel = new \App\Models\CategoryModel();
+        $categories = $categoryModel->findAll();
+
+        return view('blogs', [
             'blogs' => $blogs,
-            'categories' => $this->categoryModel->findAll(),
-            'validation' => $this->validation,
-            'currentPage' => $page,
-            'totalPages' => $totalPages,
-            'hasNextPage' => $page < $totalPages,
-            'hasPrevPage' => $page > 1
-        ];
-        return view('blogs', $data);
+            'categories' => $categories,
+            'type' => 'popular',
+            'pager' => $pager,
+            'currentPage' => $currentPage
+        ]);
     }
 
     public function manage()
@@ -172,150 +215,198 @@ class Blog extends BaseController
         return view('blog_pages/view', $data);
     }
 
-    public function create()
-    {
-        if (!$this->validate([
-            'title' => 'required|min_length[3]|max_length[255]',
-            'content' => 'required|min_length[10]',
-            'category_id' => 'required|integer',
-            'image' => 'permit_empty|max_size[image,2048]|is_image[image]|mime_in[image,image/jpg,image/jpeg,image/png]'
-        ])) {
-            return redirect()->back()
-                ->withInput()
-                ->with('errors', $this->validation->getErrors());
-        }
+    public function create() {
+        helper('url');
 
-        $data = [
-            'title' => $this->request->getPost('title'),
-            'content' => $this->request->getPost('content'),
-            'category_id' => $this->request->getPost('category_id'),
-            'user_id' => session()->get('user_id')
+        $data['categories'] = $this->categoryModel->findAll();
+        return view('blog_pages/add.php', $data);
+    } 
+
+    public function store() {
+        helper('blog_title_slugify');
+
+        $rules = [
+            'title' => 'required|min_length[5]|max_length[255]',
+            'content' => 'required',
+            'visibility' => 'required|in_list[private,public]',
+            'thumbnail' => 'permit_empty|uploaded[thumbnail]|max_size[thumbnail,2048]|is_image[thumbnail]|mime_in[thumbnail,image/jpg,image/jpeg,image/png]',
         ];
 
-        // Handle image upload
-        $image = $this->request->getFile('image');
-        if ($image->isValid() && !$image->hasMoved()) {
-            $imageName = $image->getRandomName();
-            $image->move(WRITEPATH . 'uploads/blogs', $imageName);
-            $data['image'] = $imageName;
+        if (!$this->validate($rules)) {
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        if ($this->blogModel->insert($data)) {
-            // Log the blog creation
-            $this->auditLogModel->log(
-                session()->get('user_id'),
-                'CREATE',
-                'BLOG',
-                $this->blogModel->getInsertID(),
-                'Created new blog post: ' . $data['title']
-            );
+        $user_id = session()->get('user_id');
 
-            return redirect()->to('/blogs')
-                ->with('message', 'Blog post created successfully')
-                ->with('message_type', 'success');
+        $thumbnail = $this->request->getFile('thumbnail');
+        $thumbnailName = null;
+
+        if ($thumbnail && $thumbnail->isValid() && !$thumbnail->hasMoved()) {
+            $thumbnailName = $thumbnail->getRandomName();
+            $thumbnail->move(WRITEPATH . 'uploads/thumbnails', $thumbnailName);
         }
-
-        return redirect()->back()
-            ->withInput()
-            ->with('message', 'Failed to create blog post')
-            ->with('message_type', 'danger');
-    }
-
-    public function update($id)
-    {
-        $blog = $this->blogModel->find($id);
-        if (!$blog || $blog['user_id'] !== session()->get('user_id')) {
-            throw PageNotFoundException::forPageNotFound();
-        }
-
-        if (!$this->validate([
-            'title' => 'required|min_length[3]|max_length[255]',
-            'content' => 'required|min_length[10]',
-            'category_id' => 'required|integer',
-            'image' => 'permit_empty|max_size[image,2048]|is_image[image]|mime_in[image,image/jpg,image/jpeg,image/png]'
-        ])) {
-            return redirect()->back()
-                ->withInput()
-                ->with('errors', $this->validation->getErrors());
-        }
-
+        
         $data = [
+            'user_id' => $user_id,
             'title' => $this->request->getPost('title'),
             'content' => $this->request->getPost('content'),
-            'category_id' => $this->request->getPost('category_id')
+            'visibility' => $this->request->getPost('visibility'),
+            'slug' => blog_title_slugify($this->request->getPost('title')),
+            'thumbnail' => $thumbnailName,
         ];
 
-        // Handle image upload
-        $image = $this->request->getFile('image');
-        if ($image->isValid() && !$image->hasMoved()) {
-            // Delete old image if exists
-            if ($blog['image'] !== null) {
-                $oldImagePath = WRITEPATH . 'uploads/blogs/' . $blog['image'];
-                if (file_exists($oldImagePath)) {
-                    unlink($oldImagePath);
+        $this->blogModel->db->transBegin();
+        try {
+            $blog_id = $this->blogModel->insert($data);
+            if (!$blog_id) {
+                return redirect()->back()->withInput()->with('errors', $this->blogModel->errors());
+            }
+            
+            // Save categories if selected
+            $categories = $this->request->getPost('categories');
+            if (!empty($categories)) {
+                foreach ($categories as $category_id) {
+                    $this->blogCategoryModel->insert([
+                        'blog_id' => $blog_id,
+                        'category_id' => $category_id
+                    ]);
                 }
             }
             
-            $imageName = $image->getRandomName();
-            $image->move(WRITEPATH . 'uploads/blogs', $imageName);
-            $data['image'] = $imageName;
+            $this->blogModel->db->transCommit();
+            return redirect()->to('blogs')->with('success', 'Blog created successfully!');
+            
+        } catch (\Exception $e) {
+            $this->blogModel->db->transRollback();
+            return redirect()->back()->withInput()->with('errors', ["An error occurred while creating the blog: {$e->getMessage()}"]);
         }
-
-        if ($this->blogModel->update($id, $data)) {
-            // Log the blog update
-            $this->auditLogModel->log(
-                session()->get('user_id'),
-                'UPDATE',
-                'BLOG',
-                $id,
-                'Updated blog post: ' . $data['title']
-            );
-
-            return redirect()->to('/blogs')
-                ->with('message', 'Blog post updated successfully')
-                ->with('message_type', 'success');
-        }
-
-        return redirect()->back()
-            ->withInput()
-            ->with('message', 'Failed to update blog post')
-            ->with('message_type', 'danger');
     }
 
-    public function delete($id)
-    {
-        $blog = $this->blogModel->find($id);
-        if (!$blog || $blog['user_id'] !== session()->get('user_id')) {
+    public function update($slug) {
+        helper('url');
+
+        $categories = $this->categoryModel->findAll();
+        $blog = $this->blogModel->where('slug', $slug)->first();
+
+        if (!$blog) {
             throw PageNotFoundException::forPageNotFound();
         }
 
-        // Delete image if exists
-        if ($blog['image'] !== null) {
-            $imagePath = WRITEPATH . 'uploads/blogs/' . $blog['image'];
-            if (file_exists($imagePath)) {
-                unlink($imagePath);
+        $blog_categories = $this->blogCategoryModel->select('category_id')->where('blog_id', $blog['blog_id'])->findColumn('category_id');
+        $blog['categories'] = $blog_categories;
+
+        $data = ['categories' => $categories, 'blog' => $blog];
+        return view('blog_pages/edit.php', $data);
+    }
+    
+    public function save($slug) {
+        helper('blog_title_slugify');
+
+        $rules = [
+            'title' => 'required|min_length[5]|max_length[255]',
+            'content' => 'required',
+            'visibility' => 'required|in_list[private,public]',
+            'thumbnail' => 'permit_empty|is_image[thumbnail]|max_size[thumbnail,2048]|mime_in[thumbnail,image/jpg,image/jpeg,image/png]',
+        ];
+
+        if (!$this->validate($rules)) {
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        }
+
+        $user_id = session()->get('user_id');
+        $new_slug = blog_title_slugify($this->request->getPost('title'));
+        
+        $this->blogModel->db->transBegin();
+        try {
+            $blog = $this->blogModel->where('slug', $slug)->first();
+            if (!$blog) {
+                throw PageNotFoundException::forPageNotFound();
+            }
+
+            $data = [
+                'user_id' => $user_id,
+                'title' => $this->request->getPost('title'),
+                'content' => $this->request->getPost('content'),
+                'visibility' => $this->request->getPost('visibility'),
+                'slug' => $new_slug
+            ];
+
+            $thumbnail = $this->request->getFile('thumbnail');
+            $old_thumbnail = $this->request->getPost('old_thumbnail');
+
+
+            if ($thumbnail && $thumbnail->isValid() && !$thumbnail->hasMoved()) {
+                // Upload new thumbnail
+                $thumbnailName = $thumbnail->getRandomName();
+                $thumbnail->move(WRITEPATH . 'uploads/thumbnails', $thumbnailName);
+                $data['thumbnail'] = $thumbnailName;
+                
+                // Delete old thumbnail if exists
+                if (!empty($blog['thumbnail']) && file_exists(WRITEPATH . 'uploads/thumbnails/' . $blog['thumbnail'])) {
+                    unlink(WRITEPATH . 'uploads/blogs/' . $blog['thumbnail']);
+                }
+            } else if (empty($old_thumbnail)) {
+                // If old_thumbnail is empty and no new file was uploaded, set thumbnail to null
+                $data['thumbnail'] = null;
+                
+                // Delete old thumbnail if exists
+                if (!empty($blog['thumbnail']) && file_exists(WRITEPATH . 'uploads/thumbnails/' . $blog['thumbnail'])) {
+                    unlink(WRITEPATH . 'uploads/thumbnails/' . $blog['thumbnail']);
+                }
+            }
+            log_message('error', json_encode($data));
+
+
+            $blog_id = $blog['blog_id'];
+            $this->blogModel->update($blog_id, $data);
+
+
+            $this->blogCategoryModel->where('blog_id', $blog_id)->delete();
+            
+            $categories = $this->request->getPost('categories');
+            if (!empty($categories)) {
+                foreach ($categories as $category_id) {
+                    $this->blogCategoryModel->insert([
+                        'blog_id' => $blog_id,
+                        'category_id' => $category_id
+                    ]);
+                }
+            }
+            
+            $this->blogModel->db->transCommit();
+            return redirect()->to("blogs/edit/$new_slug")->with('success', 'Blog created successfully!');
+            
+        } catch (\Exception $e) {
+            $this->blogModel->db->transRollback();
+            return redirect()->back()->withInput()->with('errors', ["An error occurred while creating the blog: {$e->getMessage()}"]);
+        }
+    }
+
+    public function delete($slug) {
+        $blog = $this->blogModel->where('slug', $slug)->first();
+        
+        if (!$blog) {
+            throw PageNotFoundException::forPageNotFound();
+        }
+
+        $user = $this->userModel->find($blog['user_id']);
+
+        if ($this->request->getPost('slug_confirmation') !== $blog['slug']) {
+            return redirect()->back()->withInput()->with('errors', 'Delete Confirmation Failed!');
+        }
+
+        // Delete the thumbnail if it exists
+        if (!empty($blog['thumbnail'])) {
+            $thumbnailPath = WRITEPATH . 'uploads/thumbnails/' . $blog['thumbnail'];
+            if (file_exists($thumbnailPath)) {
+                unlink($thumbnailPath);
             }
         }
 
-        if ($this->blogModel->delete($id)) {
-            // Log the blog deletion
-            $this->auditLogModel->log(
-                session()->get('user_id'),
-                'DELETE',
-                'BLOG',
-                $id,
-                'Deleted blog post: ' . $blog['title']
-            );
-
-            return redirect()->to('/blogs')
-                ->with('message', 'Blog post deleted successfully')
-                ->with('message_type', 'success');
-        }
-
-        return redirect()->to('/blogs')
-            ->with('message', 'Failed to delete blog post')
-            ->with('message_type', 'danger');
+        $this->blogModel->delete($blog['blog_id']);
+        return redirect()->to("blogs")->with('success', "<b>{$blog['title']}</b> by <b>{$user['first_name']} {$user['last_name']}</b> deleted successfully!");
     }
+
 
     function thumbnail($filename)
     {
@@ -328,6 +419,7 @@ class Blog extends BaseController
         return $this->response->setHeader('Content-Type', $mimeType)->setBody(file_get_contents($path));
     }
 
+
     function image($filename)
     {
         $path = WRITEPATH . 'uploads' . DIRECTORY_SEPARATOR . 'blogs' . DIRECTORY_SEPARATOR . $filename;
@@ -338,6 +430,7 @@ class Blog extends BaseController
         $mimeType = mime_content_type($path);
         return $this->response->setHeader('Content-Type', $mimeType)->setBody(file_get_contents($path));
     }
+
 
     public function upload_image()
     {
@@ -357,6 +450,7 @@ class Blog extends BaseController
             'url' => base_url('blogs/image/' . $newName),
         ]);
     }
+
 
     public function delete_image()
     {
@@ -390,7 +484,8 @@ class Blog extends BaseController
                 ->findAll(),
             'categories' => $this->categoryModel->findAll(),
             'search_query' => $query,
-            'validation' => $this->validation
+            'validation' => $this->validation,
+            'type' => 'recent' // Default to recent blogs for search results
         ];
         return view('blogs', $data);
     }
@@ -450,7 +545,8 @@ class Blog extends BaseController
             'blogs' => $blogs,
             'categories' => $this->categoryModel->findAll(),
             'current_category' => $category,
-            'validation' => $this->validation
+            'validation' => $this->validation,
+            'type' => 'recent' // Default to recent blogs for category view
         ];
 
         return view('blogs', $data);
@@ -481,8 +577,7 @@ class Blog extends BaseController
         $content = trim($this->request->getPost('content'));
 
         // Verify blog exists
-        $blog = $this->blogModel->find($blog_id);
-        if (!$blog) {
+        if (!$this->blogModel->find($blog_id)) {
             return $this->response->setJSON(['error' => 'Blog not found']);
         }
 
@@ -507,29 +602,6 @@ class Blog extends BaseController
             if (!$comment) {
                 return $this->response->setJSON(['error' => 'Failed to retrieve comment data']);
             }
-
-            // Create notification for blog owner
-            if ($blog['user_id'] !== $user_id) {
-                $this->notificationModel->createNotification(
-                    $blog['user_id'],
-                    'comment',
-                    $comment_id,
-                    sprintf(
-                        '%s commented on your blog "%s"',
-                        session()->get('user_name'),
-                        $blog['title']
-                    )
-                );
-            }
-
-            // Log the comment
-            $this->auditLogModel->log(
-                session()->get('user_id'),
-                'COMMENT',
-                'BLOG',
-                $blog_id,
-                'Added a comment to blog post'
-            );
 
             return $this->response->setJSON([
                 'success' => true, 
@@ -568,8 +640,7 @@ class Blog extends BaseController
         $content = trim($this->request->getPost('content'));
 
         // Verify comment exists
-        $comment = $this->commentModel->find($comment_id);
-        if (!$comment) {
+        if (!$this->commentModel->find($comment_id)) {
             return $this->response->setJSON(['error' => 'Comment not found']);
         }
 
@@ -594,30 +665,6 @@ class Blog extends BaseController
             if (!$replies) {
                 return $this->response->setJSON(['error' => 'Failed to retrieve reply data']);
             }
-
-            // Create notification for comment owner
-            if ($comment['user_id'] !== $user_id) {
-                $blog = $this->blogModel->find($comment['blog_id']);
-                $this->notificationModel->createNotification(
-                    $comment['user_id'],
-                    'reply',
-                    $reply_id,
-                    sprintf(
-                        '%s replied to your comment on "%s"',
-                        session()->get('user_name'),
-                        $blog['title']
-                    )
-                );
-            }
-
-            // Log the reply
-            $this->auditLogModel->log(
-                session()->get('user_id'),
-                'REPLY',
-                'BLOG',
-                $comment['blog_id'],
-                'Added a reply to blog post'
-            );
 
             return $this->response->setJSON([
                 'success' => true, 
@@ -656,8 +703,7 @@ class Blog extends BaseController
         $reaction_type = $this->request->getPost('reaction_type');
 
         // Verify blog exists
-        $blog = $this->blogModel->find($blog_id);
-        if (!$blog) {
+        if (!$this->blogModel->find($blog_id)) {
             return $this->response->setJSON(['error' => 'Blog not found']);
         }
 
@@ -687,38 +733,9 @@ class Blog extends BaseController
                     'reaction_type' => $reaction_type
                 ]);
                 $user_reaction = ['reaction_type' => $reaction_type];
-
-                // Create notification for blog owner
-                if ($blog['user_id'] !== $user_id) {
-                    $this->notificationModel->createNotification(
-                        $blog['user_id'],
-                        'reaction',
-                        $blog_id,
-                        sprintf(
-                            '%s %s your blog "%s"',
-                            session()->get('user_name'),
-                            $reaction_type === 'like' ? 'liked' : 'disliked',
-                            $blog['title']
-                        )
-                    );
-                }
             }
 
             $reactions = $this->blogReactionModel->getReactionCounts($blog_id);
-
-            // Log the reaction
-            $this->auditLogModel->log(
-                session()->get('user_id'),
-                'REACTION',
-                'BLOG',
-                $blog_id,
-                sprintf(
-                    '%s %s blog "%s"',
-                    session()->get('user_name'),
-                    $reaction_type === 'like' ? 'liked' : 'disliked',
-                    $blog['title']
-                )
-            );
 
             return $this->response->setJSON([
                 'success' => true,
@@ -792,20 +809,6 @@ class Blog extends BaseController
 
             $reactions = $this->commentReactionModel->getReactionCounts($comment_id);
 
-            // Log the reaction
-            $this->auditLogModel->log(
-                session()->get('user_id'),
-                'REACTION',
-                'BLOG',
-                $comment['blog_id'],
-                sprintf(
-                    '%s %s comment on blog "%s"',
-                    session()->get('user_name'),
-                    $reaction_type === 'like' ? 'liked' : 'disliked',
-                    $comment['content']
-                )
-            );
-
             return $this->response->setJSON([
                 'success' => true,
                 'reactions' => $reactions,
@@ -817,66 +820,5 @@ class Blog extends BaseController
             log_message('error', 'Error updating comment reaction: ' . $e->getMessage());
             return $this->response->setJSON(['error' => 'An error occurred while updating the reaction']);
         }
-    }
-
-    public function commentReaction($comment_id, $reaction_type)
-    {
-        if (!in_array($reaction_type, ['like', 'dislike'])) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'Invalid reaction type'
-            ]);
-        }
-
-        $comment = $this->commentModel->find($comment_id);
-        if (!$comment) {
-            return $this->response->setJSON([
-                'success' => false,
-                'message' => 'Comment not found'
-            ]);
-        }
-
-        $user_id = session()->get('user_id');
-        $existing_reaction = $this->commentReactionModel->where([
-            'comment_id' => $comment_id,
-            'user_id' => $user_id
-        ])->first();
-
-        if ($existing_reaction) {
-            if ($existing_reaction['reaction_type'] === $reaction_type) {
-                $this->commentReactionModel->delete($existing_reaction['reaction_id']);
-            } else {
-                $this->commentReactionModel->update($existing_reaction['reaction_id'], [
-                    'reaction_type' => $reaction_type
-                ]);
-            }
-        } else {
-            $this->commentReactionModel->insert([
-                'comment_id' => $comment_id,
-                'user_id' => $user_id,
-                'reaction_type' => $reaction_type
-            ]);
-        }
-
-        $reactions = $this->commentReactionModel->getReactionCounts($comment_id);
-
-        // Log the reaction
-        $this->auditLogModel->log(
-            session()->get('user_id'),
-            'REACTION',
-            'BLOG',
-            $comment['blog_id'],
-            sprintf(
-                '%s %s comment on blog "%s"',
-                session()->get('user_name'),
-                $reaction_type === 'like' ? 'liked' : 'disliked',
-                $comment['content']
-            )
-        );
-
-        return $this->response->setJSON([
-            'success' => true,
-            'reactions' => $reactions
-        ]);
     }
 }

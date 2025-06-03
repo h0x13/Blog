@@ -65,6 +65,200 @@ a.category-badge:hover {
     background-color: var(--bs-body-bg);
 }
 
+/* Light Mode Variables */
+:root {
+    --bs-body-bg: #ffffff;
+    --bs-body-color: #212529;
+    --bs-border-color: #dee2e6;
+    --bs-gray-100: #f8f9fa;
+    --bs-gray-200: #e9ecef;
+    --bs-gray-300: #dee2e6;
+    --bs-gray-400: #ced4da;
+    --bs-gray-500: #adb5bd;
+    --bs-gray-600: #6c757d;
+    --bs-gray-700: #495057;
+    --bs-gray-800: #343a40;
+    --bs-gray-900: #212529;
+    --bs-primary: #0d6efd;
+    --bs-secondary: #6c757d;
+    --bs-tertiary-bg: #f8f9fa;
+    --bs-dark: #212529;
+    --bs-light: #f8f9fa;
+}
+
+/* Dark Mode Variables */
+[data-bs-theme="dark"] {
+    --bs-body-bg: #212529;
+    --bs-body-color: #f8f9fa;
+    --bs-border-color: #495057;
+    --bs-gray-100: #343a40;
+    --bs-gray-200: #495057;
+    --bs-gray-300: #6c757d;
+    --bs-gray-400: #adb5bd;
+    --bs-gray-500: #ced4da;
+    --bs-gray-600: #dee2e6;
+    --bs-gray-700: #e9ecef;
+    --bs-gray-800: #f8f9fa;
+    --bs-gray-900: #ffffff;
+    --bs-tertiary-bg: #343a40;
+    --bs-dark: #212529;
+    --bs-light: #343a40;
+}
+
+/* Global Styles */
+body {
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+}
+
+/* Card Styles */
+.card {
+    background-color: var(--bs-body-bg);
+    border-color: var(--bs-border-color);
+}
+
+.card-body {
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+}
+
+/* Form Controls */
+.form-control {
+    background-color: var(--bs-body-bg);
+    border-color: var(--bs-border-color);
+    color: var(--bs-body-color);
+}
+
+.form-control:focus {
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+}
+
+/* Buttons */
+.btn-outline-primary {
+    color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--bs-primary);
+    color: #fff;
+}
+
+/* Pagination */
+.pagination .page-link {
+    background-color: var(--bs-body-bg);
+    border-color: var(--bs-border-color);
+    color: var(--bs-primary);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: #fff;
+}
+
+.pagination .page-item:not(.active) .page-link:hover {
+    background-color: var(--bs-tertiary-bg);
+    border-color: var(--bs-primary);
+}
+
+.pagination .page-item.disabled .page-link {
+    background-color: var(--bs-body-bg);
+    border-color: var(--bs-border-color);
+    color: var(--bs-gray-600);
+}
+
+/* Category Chips */
+.category-chip {
+    background-color: var(--bs-gray-100);
+    color: var(--bs-body-color);
+    border-color: var(--bs-border-color);
+}
+
+.category-chip:hover {
+    background-color: var(--bs-gray-200);
+}
+
+.category-chip.active {
+    background-color: var(--bs-primary);
+    color: #fff;
+    border-color: var(--bs-primary);
+}
+
+/* Search Results */
+#searchResults {
+    background-color: var(--bs-body-bg);
+    border-color: var(--bs-border-color);
+}
+
+#searchResults a {
+    color: var(--bs-body-color);
+    border-bottom-color: var(--bs-border-color);
+}
+
+#searchResults a:hover {
+    background-color: var(--bs-tertiary-bg);
+}
+
+.search-result-author {
+    color: var(--bs-gray-600);
+}
+
+.search-result-category {
+    background-color: var(--bs-gray-100);
+    color: var(--bs-gray-600);
+}
+
+/* Blog Cards */
+.blog-card {
+    background-color: var(--bs-body-bg);
+    border-color: var(--bs-border-color);
+}
+
+.blog-card .card-title {
+    color: var(--bs-body-color);
+}
+
+.blog-card .card-text {
+    color: var(--bs-gray-600);
+}
+
+/* Dropdowns */
+.dropdown-menu {
+    background-color: var(--bs-body-bg);
+    border-color: var(--bs-border-color);
+}
+
+.dropdown-item {
+    color: var(--bs-body-color);
+}
+
+.dropdown-item:hover {
+    background-color: var(--bs-tertiary-bg);
+}
+
+/* List Groups */
+.list-group-item {
+    background-color: var(--bs-body-bg);
+    border-color: var(--bs-border-color);
+    color: var(--bs-body-color);
+}
+
+/* Text Colors */
+.text-adaptive {
+    color: var(--bs-body-color) !important;
+}
+
+.text-muted {
+    color: var(--bs-gray-600) !important;
+}
+
+/* Transitions */
+.btn, .card, .form-control, .pagination .page-link, .category-chip {
+    transition: all 0.2s ease-in-out;
+}
+
 /* Dark/Light Mode Transitions */
 :root {
     --transition-duration: 0.3s;
@@ -649,113 +843,7 @@ body {
 [data-bs-theme="dark"] .offcanvas:focus-within {
     box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
 }
-
-
-.category-chips-container {
-    position: relative;
-    width: 100%;
-    overflow: hidden;
-    padding: 0.5rem 0;
-    margin-bottom: 1rem;
-}
-
-.category-chips-scroll {
-    display: flex;
-    gap: 0.75rem;
-    overflow-x: auto;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE and Edge */
-    padding: 0.5rem 0;
-    scroll-behavior: smooth;
-}
-
-.category-chips-scroll::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
-}
-
-.category-chip {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.5rem 1rem;
-    background-color: #f2f2f2;
-    color: #0f0f0f;
-    border-radius: 8px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    white-space: nowrap;
-    text-decoration: none;
-    transition: all 0.2s ease;
-    border: 1px solid #e5e5e5;
-    cursor: pointer;
-}
-
-.category-chip:hover {
-    background-color: #e5e5e5;
-    color: #0f0f0f;
-    text-decoration: none;
-}
-
-.category-chip.active {
-    background-color: #0f0f0f;
-    color: #ffffff;
-    border-color: #0f0f0f;
-}
-
-.category-chips-arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background-color: #ffffff;
-    border: 1px solid #e5e5e5;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 2;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.category-chips-arrow:hover {
-    background-color: #f2f2f2;
-}
-
-.category-chips-arrow-left {
-    left: 0;
-}
-
-.category-chips-arrow-right {
-    right: 0;
-}
-
-[data-bs-theme="dark"] .category-chip {
-    background-color: #272727;
-    color: #ffffff;
-    border-color: #3f3f3f;
-}
-
-[data-bs-theme="dark"] .category-chip:hover {
-    background-color: #3f3f3f;
-}
-
-[data-bs-theme="dark"] .category-chip.active {
-    background-color: #ffffff;
-    color: #0f0f0f;
-    border-color: #ffffff;
-}
-
-[data-bs-theme="dark"] .category-chips-arrow {
-    background-color: #0f0f0f;
-    border-color: #3f3f3f;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-[data-bs-theme="dark"] .category-chips-arrow:hover {
-    background-color: #272727;
-}
+/* Add this CSS to make all blog cards the same height */
 
 .blog-card {
     height: 100%;

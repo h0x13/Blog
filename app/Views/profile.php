@@ -1,4 +1,4 @@
-<?= $this->extend('templates/regular_user/base') ?>
+<?= $this->extend('templates/base') ?>
 
 <?= $this->section('title') ?>
 Profile
@@ -14,6 +14,9 @@ Profile
         <div class="container-fluid">
             <!--begin::Row-->
             <div class="row">
+                <div class="col-12">
+                    <h1 class="mb-0">Profile</h1>
+                </div>
             </div>
             <!--end::Row-->
         </div>
@@ -26,6 +29,13 @@ Profile
         <div class="container-fluid">
             <div class="row justify-content-center">
                 <div class="col-lg-8">
+                    <?php if (session()->has('message')): ?>
+                        <div class="alert alert-<?= session('message_type') ?> alert-dismissible fade show" role="alert">
+                            <?= session('message') ?>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <?php endif; ?>
+
                     <div class="card shadow-sm">
                         <div class="card-header bg-primary text-white">
                             <h5 class="card-title mb-0">
@@ -40,7 +50,7 @@ Profile
                                 <!-- Profile Image Section -->
                                 <div class="text-center mb-4">
                                     <div class="position-relative d-inline-block">
-                                        <img src="<?= isset($user['image']) && !empty($user['image']) ? base_url('uploads/profile/' . $user['image']) : base_url('assets/img/default-avatar.svg') ?>" 
+                                        <img src="<?= isset($user['image']) && !empty($user['image']) ? base_url('user-image/' . $user['image']) : base_url('assets/img/default-avatar.svg') ?>" 
                                              id="imagePreview" 
                                              class="rounded-circle border border-3 border-primary shadow-sm" 
                                              style="width: 120px; height: 120px; object-fit: cover; cursor: pointer;" 
@@ -73,7 +83,7 @@ Profile
                                                         <label for="firstName" class="form-label">First Name <span class="text-danger">*</span></label>
                                                         <input type="text" class="form-control <?= isset($validation) && $validation->hasError('first_name') ? 'is-invalid' : '' ?>" 
                                                                id="firstName" name="first_name" 
-                                                               value="<?= old('first_name', isset($user['first_name']) ? $user['first_name'] : '') ?>" required>
+                                                               value="<?= old('first_name', $user['first_name'] ?? '') ?>" required>
                                                         <?php if (isset($validation) && $validation->hasError('first_name')): ?>
                                                             <div class="invalid-feedback"><?= $validation->getError('first_name') ?></div>
                                                         <?php endif; ?>
@@ -82,7 +92,7 @@ Profile
                                                         <label for="middleName" class="form-label">Middle Name</label>
                                                         <input type="text" class="form-control <?= isset($validation) && $validation->hasError('middle_name') ? 'is-invalid' : '' ?>" 
                                                                id="middleName" name="middle_name" 
-                                                               value="<?= old('middle_name', isset($user['middle_name']) ? $user['middle_name'] : '') ?>">
+                                                               value="<?= old('middle_name', $user['middle_name'] ?? '') ?>">
                                                         <?php if (isset($validation) && $validation->hasError('middle_name')): ?>
                                                             <div class="invalid-feedback"><?= $validation->getError('middle_name') ?></div>
                                                         <?php endif; ?>
@@ -91,18 +101,19 @@ Profile
                                                         <label for="lastName" class="form-label">Last Name <span class="text-danger">*</span></label>
                                                         <input type="text" class="form-control <?= isset($validation) && $validation->hasError('last_name') ? 'is-invalid' : '' ?>" 
                                                                id="lastName" name="last_name" 
-                                                               value="<?= old('last_name', isset($user['last_name']) ? $user['last_name'] : '') ?>" required>
+                                                               value="<?= old('last_name', $user['last_name'] ?? '') ?>" required>
                                                         <?php if (isset($validation) && $validation->hasError('last_name')): ?>
                                                             <div class="invalid-feedback"><?= $validation->getError('last_name') ?></div>
                                                         <?php endif; ?>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label for="gender" class="form-label">Gender</label>
-                                                        <select class="form-select <?= isset($validation) && $validation->hasError('gender') ? 'is-invalid' : '' ?>" id="gender" name="gender">
+                                                        <select class="form-select <?= isset($validation) && $validation->hasError('gender') ? 'is-invalid' : '' ?>" 
+                                                                id="gender" name="gender">
                                                             <option value="">Select Gender</option>
-                                                            <option value="Male" <?= old('gender', isset($user['gender']) ? $user['gender'] : '') == 'Male' ? 'selected' : '' ?>>Male</option>
-                                                            <option value="Female" <?= old('gender', isset($user['gender']) ? $user['gender'] : '') == 'Female' ? 'selected' : '' ?>>Female</option>
-                                                            <option value="Other" <?= old('gender', isset($user['gender']) ? $user['gender'] : '') == 'Other' ? 'selected' : '' ?>>Other</option>
+                                                            <option value="male" <?= old('gender', $user['gender'] ?? '') == 'male' ? 'selected' : '' ?>>Male</option>
+                                                            <option value="female" <?= old('gender', $user['gender'] ?? '') == 'female' ? 'selected' : '' ?>>Female</option>
+                                                            <option value="other" <?= old('gender', $user['gender'] ?? '') == 'other' ? 'selected' : '' ?>>Other</option>
                                                         </select>
                                                         <?php if (isset($validation) && $validation->hasError('gender')): ?>
                                                             <div class="invalid-feedback"><?= $validation->getError('gender') ?></div>
@@ -112,7 +123,7 @@ Profile
                                                         <label for="birthdate" class="form-label">Birthdate</label>
                                                         <input type="date" class="form-control <?= isset($validation) && $validation->hasError('birthdate') ? 'is-invalid' : '' ?>" 
                                                                id="birthdate" name="birthdate" 
-                                                               value="<?= old('birthdate', isset($user['birthdate']) ? $user['birthdate'] : '') ?>">
+                                                               value="<?= old('birthdate', $user['birthdate'] ?? '') ?>">
                                                         <?php if (isset($validation) && $validation->hasError('birthdate')): ?>
                                                             <div class="invalid-feedback"><?= $validation->getError('birthdate') ?></div>
                                                         <?php endif; ?>
@@ -136,7 +147,7 @@ Profile
                                                         <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
                                                         <input type="email" class="form-control <?= isset($validation) && $validation->hasError('email') ? 'is-invalid' : '' ?>" 
                                                                id="email" name="email" 
-                                                               value="<?= old('email', isset($user['email']) ? $user['email'] : '') ?>" required>
+                                                               value="<?= old('email', $user['email'] ?? '') ?>" required>
                                                         <?php if (isset($validation) && $validation->hasError('email')): ?>
                                                             <div class="invalid-feedback"><?= $validation->getError('email') ?></div>
                                                         <?php endif; ?>
@@ -164,10 +175,10 @@ Profile
                                                             <button class="btn btn-outline-secondary" type="button" id="toggleCurrentPassword">
                                                                 <i class="bi bi-eye"></i>
                                                             </button>
+                                                            <?php if (isset($validation) && $validation->hasError('current_password')): ?>
+                                                                <div class="invalid-feedback"><?= $validation->getError('current_password') ?></div>
+                                                            <?php endif; ?>
                                                         </div>
-                                                        <?php if (isset($validation) && $validation->hasError('current_password')): ?>
-                                                            <div class="invalid-feedback"><?= $validation->getError('current_password') ?></div>
-                                                        <?php endif; ?>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label for="newPassword" class="form-label">New Password</label>
@@ -177,10 +188,10 @@ Profile
                                                             <button class="btn btn-outline-secondary" type="button" id="toggleNewPassword">
                                                                 <i class="bi bi-eye"></i>
                                                             </button>
+                                                            <?php if (isset($validation) && $validation->hasError('new_password')): ?>
+                                                                <div class="invalid-feedback"><?= $validation->getError('new_password') ?></div>
+                                                            <?php endif; ?>
                                                         </div>
-                                                        <?php if (isset($validation) && $validation->hasError('new_password')): ?>
-                                                            <div class="invalid-feedback"><?= $validation->getError('new_password') ?></div>
-                                                        <?php endif; ?>
                                                     </div>
                                                     <div class="col-12">
                                                         <div class="form-text">
@@ -199,9 +210,6 @@ Profile
                                     <button type="button" class="btn btn-outline-secondary" onclick="window.location.reload()">
                                         <i class="bi bi-arrow-clockwise me-1"></i>Reset
                                     </button>
-                                    <a href="<?= base_url('audit-logs') ?>" class="btn btn-secondary">
-                                        <i class="bi bi-list-ul me-1"></i>View Audit Logs
-                                    </a>
                                     <button type="submit" class="btn btn-primary">
                                         <i class="bi bi-check-lg me-1"></i>Update Profile
                                     </button>
@@ -211,7 +219,6 @@ Profile
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
     <!--end::App Content-->

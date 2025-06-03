@@ -1,4 +1,4 @@
-<?= $this->extend('templates/regular_user/base') ?>
+<?= $this->extend('templates/base') ?>
 
 <?= $this->section('title') ?>
 Blogs
@@ -53,7 +53,10 @@ Blogs
                 <?php 
                         }
                     } else {
-                        echo '<tr><td class="text-danger" colspan="6">No users</td></tr>';
+                        echo '<div class="col-12 text-center py-5">
+                                <img src="' . base_url('assets/img/empty.png') . '" alt="No blogs found" class="mb-3" style="max-width: 200px;">
+                                <p class="text-muted">No blogs found</p>
+                            </div>';
                     }
                 ?>
             </div>

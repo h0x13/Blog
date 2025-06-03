@@ -1,138 +1,97 @@
-<?= $this->extend('templates/regular_user/base.php') ?>
+<?= $this->extend('templates/base') ?>
+
+<?= $this->section('title') ?>
+Notifications
+<?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Notifications</h3>
-                    <div class="card-tools">
-                        <button type="button" class="btn btn-tool" id="markAllRead">
-                            <i class="bi bi-check-all"></i> Mark all as read
-                        </button>
-                    </div>
+<!--begin::App Main-->
+<main class="app-main">
+    <!--begin::App Content Header-->
+    <div class="app-content-header">
+        <!--begin::Container-->
+        <div class="container-fluid">
+            <!--begin::Row-->
+            <div class="row">
+                <div class="col-sm-6">
+                    <h3 class="mb-0">Notifications</h3>
                 </div>
-                <div class="card-body p-0">
-                    <div class="list-group list-group-flush">
-                        <?php if (empty($notifications)): ?>
-                            <div class="list-group-item text-center py-4">
-                                <i class="bi bi-bell-slash fs-1 text-muted"></i>
-                                <p class="mt-2 mb-0">No notifications yet</p>
-                            </div>
-                        <?php else: ?>
-                            <?php foreach ($notifications as $notification): ?>
-                                <div class="list-group-item notification-item <?= $notification['is_read'] ? '' : 'unread' ?>" 
-                                     data-id="<?= $notification['notification_id'] ?>">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1"><?= esc($notification['message']) ?></h6>
-                                        <small class="text-muted">
-                                            <?= date('M d, Y H:i', strtotime($notification['created_at'])) ?>
-                                        </small>
-                                    </div>
-                                    <?php if (isset($notification['blog_title'])): ?>
-                                        <a href="/blogs/view/<?= $notification['blog_slug'] ?>" class="text-decoration-none">
-                                            <small class="text-muted">View: <?= esc($notification['blog_title']) ?></small>
-                                        </a>
-                                    <?php endif; ?>
+            </div>
+            <!--end::Row-->
+        </div>
+        <!--end::Container-->
+    </div>
+    <!--end::App Content Header-->
+
+    <!--begin::App Content-->
+    <div class="app-content">
+        <?= $this->include('blog_pages/message') ?>
+
+        <!--begin::Container-->
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <?php if (isset($notifications) && !empty($notifications)): ?>
+                                <div class="notification-list">
+                                    <?php foreach ($notifications as $notification): ?>
+                                        <div class="notification-item p-3 border-bottom">
+                                            <div class="d-flex align-items-center">
+                                                <div class="notification-icon me-3">
+                                                    <i class="bi bi-bell-fill text-primary"></i>
+                                                </div>
+                                                <div class="notification-content flex-grow-1">
+                                                    <p class="mb-1"><?= esc($notification['message']) ?></p>
+                                                    <small class="text-muted">
+                                                        <?= (new DateTime($notification['created_at']))->format('F j, Y g:i A') ?>
+                                                    </small>
+                                                </div>
+                                                <?php if (!$notification['is_read']): ?>
+                                                    <div class="notification-status">
+                                                        <span class="badge bg-primary">New</span>
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
                                 </div>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
+                            <?php else: ?>
+                                <div class="text-center py-5">
+                                    <i class="bi bi-bell-slash display-1 text-muted"></i>
+                                    <p class="mt-3 text-muted">No notifications yet</p>
+                                </div>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+        <!--end::Container-->
     </div>
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Mark single notification as read
-    document.querySelectorAll('.notification-item').forEach(item => {
-        item.addEventListener('click', function() {
-            const notificationId = this.dataset.id;
-            if (!this.classList.contains('unread')) return;
-
-            fetch(`/notifications/mark-read/${notificationId}`, {
-                method: 'POST',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': '<?= csrf_hash() ?>'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    this.classList.remove('unread');
-                    updateUnreadCount();
-                }
-            });
-        });
-    });
-
-    // Mark all as read
-    document.getElementById('markAllRead').addEventListener('click', function() {
-        fetch('/notifications/mark-all-read', {
-            method: 'POST',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': '<?= csrf_hash() ?>'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                document.querySelectorAll('.notification-item.unread').forEach(item => {
-                    item.classList.remove('unread');
-                });
-                updateUnreadCount();
-            }
-        });
-    });
-
-    function updateUnreadCount() {
-        fetch('/notifications/unread-count', {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            const badge = document.querySelector('.nav-link[href="/notifications"] .badge');
-            if (data.count > 0) {
-                if (!badge) {
-                    const newBadge = document.createElement('span');
-                    newBadge.className = 'badge bg-danger';
-                    newBadge.textContent = data.count;
-                    document.querySelector('.nav-link[href="/notifications"]').appendChild(newBadge);
-                } else {
-                    badge.textContent = data.count;
-                }
-            } else if (badge) {
-                badge.remove();
-            }
-        });
-    }
-});
-</script>
+    <!--end::App Content-->
+</main>
+<!--end::App Main-->
 
 <style>
 .notification-item {
-    cursor: pointer;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s ease;
 }
 
 .notification-item:hover {
-    background-color: var(--bs-light);
+    background-color: var(--bs-tertiary-bg);
 }
 
-.notification-item.unread {
-    background-color: var(--bs-light);
-    border-left: 4px solid var(--bs-primary);
+.notification-icon {
+    font-size: 1.25rem;
 }
 
-.notification-item.unread h6 {
-    font-weight: 600;
+.notification-content p {
+    margin-bottom: 0.25rem;
+}
+
+.notification-status {
+    margin-left: 1rem;
 }
 </style>
 <?= $this->endSection() ?> 

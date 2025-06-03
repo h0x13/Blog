@@ -4,19 +4,16 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use App\Models\UserModel;
-use App\Models\AuditLogModel;
 use CodeIgniter\Exceptions\PageNotFoundException;
 
 class User extends BaseController
 {
     protected $userModel;
-    protected $auditLogModel;
     protected $validation;
 
     public function __construct()
     {
         $this->userModel = model(UserModel::class);
-        $this->auditLogModel = model(AuditLogModel::class);
         $this->validation = \Config\Services::validation();
     }
 
@@ -89,11 +86,15 @@ class User extends BaseController
             'password' => 'permit_empty|min_length[8]',
             'role' => 'required|in_list[admin,author,viewer]',
             'is_enabled' => 'required|in_list[0,1]',
-            'gender' => 'permit_empty|in_list[Male,Female,Other]',
+            'gender' => 'permit_empty|in_list[male,female,other]',
             'birthdate' => 'permit_empty|valid_date',
             'image' => 'permit_empty|max_size[image,2048]|is_image[image]|mime_in[image,image/jpg,image/jpeg,image/png]'
         ])) {
-            return redirect()->back()->withInput()->with('errors', $this->validation->getErrors());
+            return redirect()->back()
+                ->withInput()
+                ->with('validation', $this->validation)
+                ->with('message', 'Please check the form for errors')
+                ->with('message_type', 'danger');
         }
 
         $user = $this->userModel->find($id);
@@ -119,15 +120,30 @@ class User extends BaseController
 
         // Handle image upload
         $image = $this->request->getFile('image');
-        if ($image->isValid() && !$image->hasMoved()) {
-            // Delete old image if not default
-            if ($user['image'] !== null) {
-                unlink(WRITEPATH . 'uploads/users/' . $user['image']);
+        if ($image && $image->isValid() && !$image->hasMoved()) {
+            // Create upload directory if it doesn't exist
+            $uploadPath = WRITEPATH . 'uploads/users';
+            if (!is_dir($uploadPath)) {
+                mkdir($uploadPath, 0777, true);
+            }
+
+            // Delete old image if exists
+            if (!empty($user['image']) && file_exists($uploadPath . '/' . $user['image'])) {
+                unlink($uploadPath . '/' . $user['image']);
             }
             
             $imageName = $image->getRandomName();
-            $image->move(WRITEPATH . 'uploads/users', $imageName);
+            $image->move($uploadPath, $imageName);
             $data['image'] = $imageName;
+        }
+
+        // Handle image removal
+        if ($this->request->getPost('remove_image') === '1') {
+            $uploadPath = WRITEPATH . 'uploads/users';
+            if (!empty($user['image']) && file_exists($uploadPath . '/' . $user['image'])) {
+                unlink($uploadPath . '/' . $user['image']);
+            }
+            $data['image'] = null;
         }
 
         if ($this->userModel->update($id, $data)) {
@@ -138,6 +154,7 @@ class User extends BaseController
 
         return redirect()->back()
             ->withInput()
+            ->with('validation', $this->validation)
             ->with('message', 'Failed to update user')
             ->with('message_type', 'danger');
     }
@@ -169,43 +186,53 @@ class User extends BaseController
     
     public function profile() 
     {
-        $user = $this->userModel->find(session()->get('user_id'));
+        // Get the logged-in user's ID from session
+        $user_id = session()->get('user_id');
+        if (!$user_id) {
+            return redirect()->to('/login');
+        }
+
+        $user = $this->userModel->find($user_id);
         if (!$user) {
             throw PageNotFoundException::forPageNotFound();
         }
 
-        // Get user's audit logs
-        $logs = $this->auditLogModel->getUserLogs($user['user_id']);
-        
-        return view('profile', [
-            'user' => $user, 
-            'validation' => $this->validation,
-            'logs' => $logs
-        ]);
+        return view('profile', ['user' => $user]);
     }
 
     public function updateProfile()
     {
-        if (!$this->validate([
-            'first_name' => 'required|min_length[2]|max_length[50]',
-            'last_name' => 'required|min_length[2]|max_length[50]',
-            'middle_name' => 'permit_empty|min_length[2]|max_length[50]',
-            'email' => "required|valid_email|is_unique[users.email,user_id," . session()->get('user_id') . "]",
-            'current_password' => 'permit_empty|min_length[8]',
-            'new_password' => 'permit_empty|min_length[8]',
-            'gender' => 'permit_empty|in_list[Male,Female,Other]',
-            'birthdate' => 'permit_empty|valid_date',
-            'image' => 'permit_empty|max_size[image,2048]|is_image[image]|mime_in[image,image/jpg,image/jpeg,image/png]'
-        ])) {
-            return redirect()->back()->withInput()->with('errors', $this->validation->getErrors());
+        // Get the logged-in user's ID from session
+        $user_id = session()->get('user_id');
+        if (!$user_id) {
+            return redirect()->to('/login');
         }
 
-        $userId = session()->get('user_id');
-        $user = $this->userModel->find($userId);
+        $user = $this->userModel->find($user_id);
         if (!$user) {
             throw PageNotFoundException::forPageNotFound();
         }
 
+        // Validate the input
+        if (!$this->validate([
+            'first_name' => 'required|min_length[2]|max_length[50]',
+            'last_name' => 'required|min_length[2]|max_length[50]',
+            'middle_name' => 'permit_empty|min_length[2]|max_length[50]',
+            'email' => "required|valid_email|is_unique[users.email,user_id,{$user_id}]",
+            'gender' => 'permit_empty|in_list[male,female,other]',
+            'birthdate' => 'permit_empty|valid_date',
+            'image' => 'permit_empty|max_size[image,2048]|is_image[image]|mime_in[image,image/jpg,image/jpeg,image/png]',
+            'current_password' => 'permit_empty|min_length[8]',
+            'new_password' => 'permit_empty|min_length[8]'
+        ])) {
+            return redirect()->back()
+                ->withInput()
+                ->with('validation', $this->validation)
+                ->with('message', 'Please check the form for errors')
+                ->with('message_type', 'danger');
+        }
+
+        // Prepare update data
         $data = [
             'first_name' => $this->request->getPost('first_name'),
             'last_name' => $this->request->getPost('last_name'),
@@ -215,57 +242,63 @@ class User extends BaseController
             'birthdate' => $this->request->getPost('birthdate')
         ];
 
-        // Handle password change if provided
-        $currentPassword = $this->request->getPost('current_password');
-        $newPassword = $this->request->getPost('new_password');
-        
-        if ($currentPassword && $newPassword) {
+        // Handle password update if provided
+        $current_password = $this->request->getPost('current_password');
+        $new_password = $this->request->getPost('new_password');
+
+        if (!empty($current_password) && !empty($new_password)) {
             // Verify current password
-            if (!password_verify($currentPassword, $user['password'])) {
+            if (!password_verify($current_password, $user['password'])) {
                 return redirect()->back()
                     ->withInput()
+                    ->with('validation', $this->validation)
                     ->with('message', 'Current password is incorrect')
                     ->with('message_type', 'danger');
             }
-            $data['password'] = password_hash($newPassword, PASSWORD_DEFAULT);
+            $data['password'] = password_hash($new_password, PASSWORD_DEFAULT);
         }
 
         // Handle image upload
         $image = $this->request->getFile('image');
-        if ($image->isValid() && !$image->hasMoved()) {
+        if ($image && $image->isValid() && !$image->hasMoved()) {
+            // Create upload directory if it doesn't exist
+            $uploadPath = WRITEPATH . 'uploads/users';
+            if (!is_dir($uploadPath)) {
+                mkdir($uploadPath, 0777, true);
+            }
+
             // Delete old image if exists
-            if ($user['image'] !== null) {
-                $oldImagePath = WRITEPATH . 'uploads/profile/' . $user['image'];
-                if (file_exists($oldImagePath)) {
-                    unlink($oldImagePath);
-                }
+            if (!empty($user['image']) && file_exists($uploadPath . '/' . $user['image'])) {
+                unlink($uploadPath . '/' . $user['image']);
             }
             
             $imageName = $image->getRandomName();
-            $image->move(WRITEPATH . 'uploads/profile', $imageName);
+            $image->move($uploadPath, $imageName);
             $data['image'] = $imageName;
         }
 
         // Handle image removal
-        if ($this->request->getPost('remove_image')) {
-            if ($user['image'] !== null) {
-                $oldImagePath = WRITEPATH . 'uploads/profile/' . $user['image'];
-                if (file_exists($oldImagePath)) {
-                    unlink($oldImagePath);
-                }
+        if ($this->request->getPost('remove_image') === '1') {
+            $uploadPath = WRITEPATH . 'uploads/profile';
+            if (!empty($user['image']) && file_exists($uploadPath . '/' . $user['image'])) {
+                unlink($uploadPath . '/' . $user['image']);
             }
             $data['image'] = null;
         }
 
-        if ($this->userModel->update($userId, $data)) {
-            // Log the profile update
-            $this->auditLogModel->log(
-                $userId,
-                'UPDATE',
-                'PROFILE',
-                $userId,
-                'User updated their profile'
-            );
+        // Update user
+        if ($this->userModel->update($user_id, $data)) {
+            // Update session data
+            $updatedUser = $this->userModel->find($user_id);
+            $sessionData = [
+                'user_id' => $updatedUser['user_id'],
+                'first_name' => $updatedUser['first_name'],
+                'last_name' => $updatedUser['last_name'],
+                'email' => $updatedUser['email'],
+                'role' => $updatedUser['role'],
+                'image' => $updatedUser['image']
+            ];
+            session()->set($sessionData);
 
             return redirect()->to('/profile')
                 ->with('message', 'Profile updated successfully')
@@ -274,17 +307,8 @@ class User extends BaseController
 
         return redirect()->back()
             ->withInput()
+            ->with('validation', $this->validation)
             ->with('message', 'Failed to update profile')
             ->with('message_type', 'danger');
-    }
-
-    public function auditLogs()
-    {
-        if (session()->get('role') !== 'admin') {
-            return redirect()->to('/dashboard');
-        }
-
-        $logs = $this->auditLogModel->getAllLogs();
-        return view('audit_logs', ['logs' => $logs]);
     }
 }

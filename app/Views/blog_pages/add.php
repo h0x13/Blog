@@ -1,4 +1,4 @@
-<?= $this->extend('templates/regular_user/base') ?>
+<?= $this->extend('templates/base') ?>
 
 <?= $this->section('title') ?>Create New Blog<?= $this->endSection() ?>
 

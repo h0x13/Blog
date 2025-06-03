@@ -1,7 +1,7 @@
 <!--begin::Header-->
 <nav class="app-header navbar navbar-expand bg-body py-0">
     <!--begin::Container-->
-    <div class="container-fluid py-1">
+    <div class="container-fluid">
         <!--begin::Start Navbar Links-->
         <ul class="navbar-nav">
             <li class="nav-item">
@@ -37,7 +37,7 @@
                     data-bs-toggle="dropdown"
                 >
                     <img
-                        src="<?= session()->get('image')? base_url('image' . session()->get('image')) 
+                        src="<?= session()->get('image')? base_url('user-image/' . session()->get('image')) 
                             :  base_url('assets/img/default-avatar.svg') ?>"
                         class="user-image rounded-circle shadow border"
                         alt="User Image"
@@ -49,7 +49,7 @@
                         <li class="list-group-item border-bottom">
                             <div class="d-flex align-items-center">
                                 <img
-                                    src="<?= session()->get('image')? base_url('image' . session()->get('image')) 
+                                    src="<?= session()->get('image')? base_url('user-image/' . session()->get('image')) 
                                         :  base_url('assets/img/default-avatar.svg') ?>"
                                     class="rounded-circle shadow me-2"
                                     alt="User Image"

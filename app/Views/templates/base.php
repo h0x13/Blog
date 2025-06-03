@@ -26,14 +26,17 @@
         <!--begin::App Wrapper-->
         <div class="app-wrapper">
 
+            <?php if (session()->get('role') === 'admin'): ?>
             <?= $this->include('components/navbar') ?>
-
             <?= $this->include('components/sidebar') ?>
+            <?php else: ?>
+                <?= $this->include('components/regular_user/navbar') ?>
+                <?= $this->include('components/regular_user/sidebar') ?>
+            <?php endif; ?>
 
             <?= $this->renderSection('content') ?>
 
             <?= $this->include('components/scripts') ?>
-
 
         </div>
         <!--end::App Wrapper-->
