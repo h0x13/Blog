@@ -63,9 +63,14 @@ Blogs
                             </div>
                 <?php 
                         }
-                    } else {
-                        echo '<tr><td class="text-danger" colspan="6">No users</td></tr>';
-                    }
+                    } else { ?>
+                        <div class="col-12 text-center py-5">
+                            <img src="<?= base_url('assets/img/empty.png') ?>" alt="No blogs" class="img-fluid mb-4 me-5" style="max-height: 250px;">
+                            <h4 class="text-muted">No Blogs Found</h4>
+                            <p class="text-secondary">There are no blog posts yet. You can add a new one to get started.</p>
+                            <a href="<?= base_url('blogs/add') ?>" class="btn btn-success mt-3">Create Your First Blog</a>
+                        </div>
+                <?php }
                 ?>
             </div>
         </div>

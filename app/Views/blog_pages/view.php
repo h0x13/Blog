@@ -1,216 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $title ?? 'Blog App' ?></title>
-    
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #34495e;
-            --accent-color: #3498db;
-            --text-color: #2c3e50;
-            --light-gray: #f8f9fa;
-            --medium-gray: #e9ecef;
-            --dark-gray: #6c757d;
-        }
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            color: var(--text-color);
-            line-height: 1.7;
-            background-color: #f5f5f5;
-            padding-top: 70px;
-        }
-        
-        h1, h2, h3, h4, h5, h6 {
-            font-weight: 700;
-        }
-        
-        .article-header {
-            margin-bottom: 3rem;
-        }
-        
-        .thumbnail-container {
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            margin-bottom: 2.5rem;
-        }
-        
-        .thumbnail-container img {
-            width: 100%;
-            height: auto;
-            object-fit: cover;
-            transition: transform 0.3s ease;
-        }
-        
-        .thumbnail-container:hover img {
-            transform: scale(1.02);
-        }
-        
-        .article-title {
-            font-size: 2.5rem;
-            line-height: 1.2;
-            margin-bottom: 1.5rem;
-        }
-        
-        .author-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-        
-        .author-avatar {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border: 3px solid white;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            margin-bottom: 1rem;
-        }
-        
-        .author-meta {
-            text-align: center;
-            color: var(--dark-gray);
-            font-size: 0.95rem;
-        }
-        
-        .author-name {
-            color: var(--primary-color);
-            font-weight: 500;
-        }
-        
-        .reading-time {
-            font-size: 0.85rem;
-            color: var(--dark-gray);
-        }
-        
-        .category-badge {
-            background-color: var(--light-gray);
-            border: 1px solid var(--primary-color);
-            color: var(--primary-color);
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-            margin: 0 0.5rem 0.5rem 0;
-            border-radius: 50px;
-            transition: all 0.2s ease;
-            text-decoration: none;
-        }
-        
-        .category-badge:hover {
-            background-color: var(--accent-color);
-            color: white;
-            text-decoration: none;
-        }
-        
-        article {
-            font-size: 1.1rem;
-            color: #444;
-        }
-        
-        article img {
-            max-width: 100%;
-            border-radius: 8px;
-            margin: 2rem 0;
-        }
-        
-        article p {
-            margin-bottom: 1.5rem;
-        }
-        
-        article h2 {
-            margin: 2.5rem 0 1.5rem;
-            color: var(--primary-color);
-        }
-        
-        article h3 {
-            margin: 2rem 0 1.25rem;
-            color: var(--secondary-color);
-        }
-        
-        .back-button {
-            padding: 0.75rem 1.5rem;
-            font-weight: 500;
-            border-radius: 50px;
-            transition: all 0.2s ease;
-        }
-        
-        .back-button:hover {
-            transform: translateX(-5px);
-        }
-        
-        .navbar {
-            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
-        }
-        
-        .navbar-brand {
-            font-family: 'Playfair Display', serif;
-            font-weight: 700;
-            font-size: 1.5rem;
-        }
-        
-        footer {
-            box-shadow: 0 -2px 15px rgba(0,0,0,0.1);
-        }
-        
-        @media (max-width: 768px) {
-            .article-title {
-                font-size: 2rem;
-            }
-            
-            .author-avatar {
-                width: 80px;
-                height: 80px;
-            }
-            
-            article {
-                font-size: 1rem;
-            }
-        }
+<?= $this->extend('templates/regular_user/base') ?>
 
-    </style>
-</head>
-<body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="<?= base_url() ?>">Blog App</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="<?= base_url('/blogs') ?>">Blogs</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="<?= base_url('/categories') ?>">Categories</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="<?= base_url('/login') ?>">Login</a>
-                    </li>
-                </ul>
+<?= $this->section('title') ?>
+<?= esc($blog['title']) ?>
+<?= $this->endSection() ?>
+
+<?= $this->section('content') ?>
+<!--begin::App Main-->
+<main class="app-main position-relative">
+    <!--begin::App Content Header-->
+    <div class="app-content-header">
+        <!--begin::Container-->
+        <div class="container-fluid">
+            <!--begin::Row-->
+            <div class="row">
+                <!-- Back Button -->
+                <div class="col-12">
+                    <a href="<?= base_url('/blogs') ?>" class="btn btn-secondary position-absolute">
+                        <i class="bi bi-arrow-left"></i>
+                    </a>
+                </div>
             </div>
+            <!--end::Row-->
         </div>
-    </nav>
+        <!--end::Container-->
+    </div>
+    <!--end::App Content Header-->
 
-    <!-- Main Content -->
-    <main class="container">
-        <div class="container-fluid py-2">
+    <!--begin::App Content-->
+    <div class="app-content">
+        <?= $this->include('blog_pages/message') ?>
+
+        <!--begin::Container-->
+        <div class="container-fluid">
             <div class="row justify-content-center">
                 <div class="col-lg-10">
                     <!-- Blog Header -->
@@ -250,44 +71,218 @@
                             </div>
                         <?php endif; ?>
                     </header>
-                    
+
                     <!-- Blog Content -->
-                    <article class="mb-5">
+                    <article class="blog-content">
                         <?= $blog['content'] ?>
                     </article>
-                    
-                    <!-- Back to Blogs Button -->
-                    <div class="d-flex justify-content-center mb-5">
-                        <a href="<?= previous_url() ?>" class="btn btn-outline-primary back-button">
-                            <i class="bi bi-arrow-left me-2"></i> Back to All Articles
-                        </a>
-                    </div>
                 </div>
             </div>
         </div>
-    </main>
+        <!--end::Container-->
+    </div>
+    <!--end::App Content-->
+</main>
+<!--end::App Main-->
 
-    <!-- Footer -->
-    <footer class="bg-dark text-white py-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6 text-center text-md-start">
-                    <h5 class="mb-3">Blog App</h5>
-                    <p class="small">Sharing knowledge and ideas through thoughtful writing.</p>
-                </div>
-                <div class="col-md-6 text-center text-md-end">
-                    <div class="mb-3">
-                        <a href="#" class="text-white me-3"><i class="bi bi-facebook"></i></a>
-                        <a href="#" class="text-white me-3"><i class="bi bi-twitter"></i></a>
-                        <a href="#" class="text-white"><i class="bi bi-instagram"></i></a>
-                    </div>
-                    <p class="small mb-0">&copy; <?= date('Y') ?> Blog App. All rights reserved.</p>
-                </div>
-            </div>
-        </div>
-    </footer>
+<!-- Back to Top Button -->
+<button id="back-to-top" class="btn btn-primary back-to-top" title="Back to Top">
+    <i class="bi bi-arrow-up"></i>
+</button>
 
-    <!-- Bootstrap 5 JS Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<style>
+    :root {
+        --primary-color: #2c3e50;
+        --secondary-color: #34495e;
+        --accent-color: #3498db;
+        --text-color: #2c3e50;
+        --light-gray: #f8f9fa;
+        --medium-gray: #e9ecef;
+        --dark-gray: #6c757d;
+    }
+
+    [data-bs-theme="dark"] {
+        --primary-color: #e9ecef;
+        --secondary-color: #dee2e6;
+        --accent-color: #3498db;
+        --text-color: #e9ecef;
+        --light-gray: #212529;
+        --medium-gray: #343a40;
+        --dark-gray: #adb5bd;
+    }
+    
+    .article-header {
+        margin-bottom: 3rem;
+    }
+    
+    .thumbnail-container {
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        margin-bottom: 2.5rem;
+    }
+    
+    .thumbnail-container img {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    
+    .thumbnail-container:hover img {
+        transform: scale(1.02);
+    }
+    
+    .article-title {
+        font-size: 2.5rem;
+        line-height: 1.2;
+        margin-bottom: 1.5rem;
+        color: var(--text-color);
+    }
+    
+    .author-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    
+    .author-avatar {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border: 3px solid var(--light-gray);
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        margin-bottom: 1rem;
+    }
+    
+    .author-meta {
+        text-align: center;
+        color: var(--dark-gray);
+        font-size: 0.95rem;
+    }
+    
+    .author-name {
+        color: var(--primary-color);
+        font-weight: 500;
+    }
+    
+    .reading-time {
+        font-size: 0.85rem;
+        color: var(--dark-gray);
+    }
+    
+    .category-badge {
+        background-color: var(--light-gray);
+        border: 1px solid var(--primary-color);
+        color: var(--primary-color);
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        margin: 0 0.5rem 0.5rem 0;
+        border-radius: 50px;
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+    
+    .category-badge:hover {
+        background-color: var(--accent-color);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .blog-content {
+        font-size: 1.1rem;
+        color: var(--text-color);
+    }
+    
+    .blog-content img {
+        max-width: 100%;
+        border-radius: 8px;
+        margin: 2rem 0;
+    }
+    
+    .blog-content p {
+        margin-bottom: 1.5rem;
+    }
+    
+    .blog-content h2 {
+        margin: 2.5rem 0 1.5rem;
+        color: var(--primary-color);
+    }
+    
+    .blog-content h3 {
+        margin: 2rem 0 1.25rem;
+        color: var(--secondary-color);
+    }
+    
+    .back-button:hover {
+        transform: translateX(-5px);
+        background-color: var(--primary-color);
+        color: var(--light-gray);
+    }
+
+    /* Back to Top Button Styles */
+    .back-to-top {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        z-index: 1000;
+        padding: 0;
+    }
+
+    .back-to-top.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .back-to-top:hover {
+        transform: translateY(-5px);
+    }
+    
+    @media (max-width: 768px) {
+        .article-title {
+            font-size: 2rem;
+        }
+        
+        .author-avatar {
+            width: 80px;
+            height: 80px;
+        }
+        
+        .blog-content {
+            font-size: 1rem;
+        }
+    }
+</style>
+
+<script>
+    // Back to Top Button Functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const backToTopButton = document.getElementById('back-to-top');
+        
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 300) {
+                backToTopButton.classList.add('show');
+            } else {
+                backToTopButton.classList.remove('show');
+            }
+        });
+        
+        backToTopButton.addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    });
+</script>
+<?= $this->endSection() ?>

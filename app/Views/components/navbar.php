@@ -63,7 +63,7 @@
                             </a>
                         </li>
                         <li class="list-group-item">
-                            <a href="#" class="text-decoration-none text-adaptive d-block w-100">
+                            <a href="<?= base_url('logout') ?>" class="text-decoration-none text-adaptive d-block w-100">
                                 <i class="bi bi-box-arrow-in-left me-2"></i> Sign out
                             </a>
                         </li>

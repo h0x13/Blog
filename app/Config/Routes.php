@@ -5,6 +5,7 @@ use App\Controllers\Home;
 use App\Controllers\Image;
 use App\Controllers\User;
 use App\Controllers\Category;
+use App\Controllers\VerificationController;
 use CodeIgniter\Router\RouteCollection;
 
 /**
@@ -12,11 +13,17 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('/', [Home::class, 'index']);
 $routes->get('/register', [Home::class, 'register']);
+$routes->post('/register', [Home::class, 'processRegistration']);
+$routes->get('/verification-pending', [Home::class, 'verificationPending']);
 $routes->get('/login', [Home::class, 'login']);
 $routes->get('/about', [Home::class, 'about']);
 $routes->get('/dashboard', [Home::class, 'dashboard']);
 $routes->get('user-image/(:segment)', [Image::class, 'image/$1']);
 $routes->get('/profile', [User::class, 'profile']);
+
+// Verification routes
+$routes->get('verify-email/(:segment)', [VerificationController::class, 'verify/$1']);
+$routes->get('resend-verification', [VerificationController::class, 'resendVerification']);
 
 // User routes
 $routes->group('users', function($routes) {
@@ -40,6 +47,9 @@ $routes->group('blogs', function($routes) {
     $routes->get('/', [Blog::class, 'index']);
     $routes->get('popular/', [Blog::class, 'popular']);
     $routes->get('manage/', [Blog::class, 'manage']);
+    $routes->get('search', [Blog::class, 'search']);
+    $routes->get('category/(:segment)', [Blog::class, 'category/$1']);
+    $routes->get('search-result', [Blog::class, 'searchResult']);
     // $routes->get('popular/', [Blog::class, 'index']);
     $routes->get('view/(:segment)', [Blog::class, 'view/$1']);
     $routes->get('add', [Blog::class, 'create']);
@@ -55,4 +65,13 @@ $routes->group('blogs', function($routes) {
 
     // $routes->get('saves/', [Blog::class, 'index']);
 });
+
+// Authentication Routes
+$routes->get('login', 'Home::login');
+$routes->post('login', 'Home::processLogin');
+$routes->get('logout', 'Home::logout');
+$routes->get('forgot-password', 'Home::forgotPassword');
+$routes->post('forgot-password', 'Home::processForgotPassword');
+$routes->get('reset-password/(:segment)', 'Home::resetPassword/$1');
+$routes->post('reset-password', 'Home::processResetPassword');
 

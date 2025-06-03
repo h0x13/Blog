@@ -1,3 +1,15 @@
+<?php
+function isActivePage($page) {
+    $currentPage = uri_string();
+    if ($page === 'home' && $currentPage === '') {
+        return 'active';
+    }
+    if ($page === 'reset' && strpos($currentPage, 'reset-password') !== false) {
+        return 'active';
+    }
+    return '';
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -50,7 +62,7 @@
 
       <nav id="navmenu" class="navmenu">
         <ul>
-          <li><a href="<?= base_url('/#hero') ?>" class="active">Home</a></li>
+          <li><a href="<?= base_url('/#hero') ?>" class="<?= isActivePage('home') ?>">Home</a></li>
           <li><a href="<?= base_url('/#about') ?>">About</a></li>
           <li><a href="<?= base_url('/#services') ?>">Features</a></li>
           <li><a href="<?= base_url('/#categories') ?>">Categories</a></li>
@@ -59,7 +71,7 @@
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
 
-      <a class="cta-btn" href="index.html#about">Sign In</a>
+      <a class="cta-btn" href="<?= base_url('login') ?>">Sign In</a>
 
     </div>
   </header>

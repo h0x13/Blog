@@ -36,6 +36,7 @@ class Blog extends BaseController
                 ->select('blogs.*, users.first_name, users.last_name, users.middle_name')
                 ->join('users', 'users.user_id = blogs.user_id')
                 ->findAll(),
+            'categories' => $this->categoryModel->findAll(),
             'validation' => $this->validation
         ];
         return view('blogs', $data);
@@ -65,7 +66,7 @@ class Blog extends BaseController
             'blogs' => $this->blogModel
                 ->select('blogs.*, users.first_name, users.last_name, users.middle_name')
                 ->join('users', 'users.user_id = blogs.user_id')
-                ->findAll(),
+                ->find(session()->get('user_id')),
             'validation' => $this->validation
         ];
         return view('manage_blogs', $data);
@@ -122,8 +123,7 @@ class Blog extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        // $user_id = session()->get('user_id');
-        $user_id = 2;
+        $user_id = session()->get('user_id');
 
         $thumbnail = $this->request->getFile('thumbnail');
         $thumbnailName = null;
@@ -200,8 +200,7 @@ class Blog extends BaseController
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
-        // $user_id = session()->get('user_id');
-        $user_id = 2;
+        $user_id = session()->get('user_id');
         $new_slug = blog_title_slugify($this->request->getPost('title'));
         
         $this->blogModel->db->transBegin();
@@ -356,5 +355,85 @@ class Blog extends BaseController
         } else {
             return $this->response->setJSON(['error' => 'Image not found']);
         }
+    }
+
+    public function searchResult()
+    {
+        helper('get_introduction');
+        helper('url');
+
+        $query = $this->request->getGet('q');
+        $data = [
+            'blogs' => $this->blogModel
+                ->select('blogs.*, users.first_name, users.last_name, users.middle_name')
+                ->join('users', 'users.user_id = blogs.user_id')
+                ->like('blogs.title', $query)
+                ->findAll(),
+            'categories' => $this->categoryModel->findAll(),
+            'search_query' => $query,
+            'validation' => $this->validation
+        ];
+        return view('blogs', $data);
+    }
+
+    public function search()
+    {
+        $query = $this->request->getGet('query');
+        
+        if (empty($query)) {
+            return $this->response->setJSON([]);
+        }
+
+        try {
+            $blogs = $this->blogModel
+                ->select('blogs.*, users.first_name, users.last_name, users.middle_name')
+                ->join('users', 'users.user_id = blogs.user_id')
+                ->like('blogs.title', $query)
+                // ->orLike('blogs.content', $query)
+                ->findAll();
+
+            // Get categories for each blog
+            foreach ($blogs as &$blog) {
+                $blog['categories'] = $this->categoryModel
+                    ->select('categories.*')
+                    ->join('blog_categories', 'blog_categories.category_id = categories.category_id')
+                    ->where('blog_categories.blog_id', $blog['blog_id'])
+                    ->findAll();
+            }
+
+            log_message('debug', 'Search results: ' . json_encode($blogs));
+            return $this->response->setJSON($blogs);
+        } catch (\Exception $e) {
+            log_message('error', 'Search error: ' . $e->getMessage());
+            return $this->response->setStatusCode(500)->setJSON(['error' => 'An error occurred while searching']);
+        }
+    }
+
+    public function category($name)
+    {
+        helper('get_introduction');
+        helper('url');
+
+        $category = $this->categoryModel->where('name', $name)->first();
+        
+        if (!$category) {
+            throw PageNotFoundException::forPageNotFound();
+        }
+
+        $blogs = $this->blogModel
+            ->select('blogs.*, users.first_name, users.last_name, users.middle_name')
+            ->join('users', 'users.user_id = blogs.user_id')
+            ->join('blog_categories', 'blog_categories.blog_id = blogs.blog_id')
+            ->where('blog_categories.category_id', $category['category_id'])
+            ->findAll();
+
+        $data = [
+            'blogs' => $blogs,
+            'categories' => $this->categoryModel->findAll(),
+            'current_category' => $category,
+            'validation' => $this->validation
+        ];
+
+        return view('blogs', $data);
     }
 }

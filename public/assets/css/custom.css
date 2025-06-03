@@ -60,3 +60,7 @@ a.category-badge:hover {
 .text-adaptive {
     color: var(--bs-body-color);
 }
+
+.text-bg-adaptive {
+    background-color: var(--bs-body-bg);
+}
