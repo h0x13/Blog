@@ -1,7 +1,7 @@
 <!--begin::Header-->
-<nav class="app-header navbar navbar-expand bg-body">
+<nav class="app-header navbar navbar-expand bg-body py-0">
     <!--begin::Container-->
-    <div class="container-fluid">
+    <div class="container-fluid py-1">
         <!--begin::Start Navbar Links-->
         <ul class="navbar-nav">
             <li class="nav-item">

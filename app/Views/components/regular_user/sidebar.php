@@ -40,28 +40,30 @@ function isActivePage($page) {
                 </li>
                 <li class="nav-item">
                     <a
-                        href="#"
+                        href="/blogs/popular"
                         class="nav-link <?php isActivePage('popular') ?>">
                         <i class="nav-icon bi bi-graph-up"></i>
                         <p>Popular</p>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a
-                        href="/blogs/manage"
-                        class="nav-link <?php isActivePage('manage') ?>">
-                        <i class="nav-icon bi bi-journal-text"></i>
-                        <p>Your Blogs</p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a
-                        href="#"
-                        class="nav-link <?php isActivePage('saves') ?>">
-                        <i class="nav-icon bi bi-bookmark-star"></i>
-                        <p>Saves</p>
-                    </a>
-                </li>
+                <?php if (session()->get('isLoggedIn'))) { ?>
+                    <li class="nav-item">
+                        <a
+                            href="/blogs/manage"
+                            class="nav-link <?php isActivePage('manage') ?>">
+                            <i class="nav-icon bi bi-journal-text"></i>
+                            <p>Your Blogs</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a
+                            href="/notifications"
+                            class="nav-link <?php isActivePage('notifications') ?>">
+                            <i class="nav-icon bi bi-bell"></i>
+                            <p>Notifications</p>
+                        </a>
+                    </li>
+                <?php } ?>
             </ul>
             <!--end::Sidebar Menu-->
         </nav>

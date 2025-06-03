@@ -1,3 +1,5 @@
+<?= $this->extend(session()->get('role') === 'admin' ? 'templates/base' : 'templates/regular_user/base') ?>
+
 <!doctype html>
 <html lang="en">
     <!--begin::Head-->
@@ -30,7 +32,9 @@
 
             <?= $this->include('components/regular_user/sidebar') ?>
 
-            <?= $this->renderSection('content') ?>
+            <?= $this->section('content') ?>
+            // ... content ...
+            <?= $this->endSection() ?>
 
             <?= $this->include('components/scripts') ?>
 

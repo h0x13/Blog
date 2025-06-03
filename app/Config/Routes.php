@@ -6,6 +6,8 @@ use App\Controllers\Image;
 use App\Controllers\User;
 use App\Controllers\Category;
 use App\Controllers\VerificationController;
+use App\Controllers\Notification;
+use App\Controllers\AuditLogController;
 use CodeIgniter\Router\RouteCollection;
 
 /**
@@ -63,6 +65,12 @@ $routes->group('blogs', function($routes) {
     $routes->post('upload_image', [Blog::class, 'upload_image']);
     $routes->post('delete_image', [Blog::class, 'delete_image']);
 
+    // Comments and Reactions
+    $routes->post('comment/add', [Blog::class, 'addComment']);
+    $routes->post('comment/reply', [Blog::class, 'addReply']);
+    $routes->post('reaction/blog', [Blog::class, 'reactToBlog']);
+    $routes->post('reaction/comment', [Blog::class, 'reactToComment']);
+
     // $routes->get('saves/', [Blog::class, 'index']);
 });
 
@@ -74,4 +82,16 @@ $routes->get('forgot-password', 'Home::forgotPassword');
 $routes->post('forgot-password', 'Home::processForgotPassword');
 $routes->get('reset-password/(:segment)', 'Home::resetPassword/$1');
 $routes->post('reset-password', 'Home::processResetPassword');
+
+// Notification routes
+$routes->group('notifications', function($routes) {
+    $routes->get('/', [Notification::class, 'index']);
+    $routes->post('mark-read/(:num)', [Notification::class, 'markAsRead/$1']);
+    $routes->post('mark-all-read', [Notification::class, 'markAllAsRead']);
+    $routes->get('unread-count', [Notification::class, 'getUnreadCount']);
+});
+
+// Audit Logs Routes
+$routes->get('audit-logs', 'AuditLogController::index');
+$routes->get('audit-logs/export', 'AuditLogController::export');
 

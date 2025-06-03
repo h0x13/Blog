@@ -53,147 +53,76 @@ Blogs
         <div class="container-fluid">
             <div class="row bg-transparent">
                 <?php
-                    if (isset($blogs) && !empty($blogs)) {
-                        foreach ($blogs as $blog) { ?>
-                            <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3 mb-sm-0">
-                                <div class="card blog-card">
-                                    <img src="<?= base_url('blogs/thumbnail/' . $blog['thumbnail']) ?>" alt="">
-                                    <div class="card-body blog-body">
-                                        <h5 class="card-title fw-bold mb-3">
-                                            <?= esc($blog['title']) ?>
-                                        </h5>
-                                        <p class="card-text content"><?= get_introduction($blog['content']) ?></p>
-                                        <p class="card-text author my-0"><b>Last Modified&colon;</b> <?= (new DateTime($blog['updated_at']))->format('F j, Y') ?></p>
-                                        <p class="card-text last-modified my-0"><b>Author&colon;</b> <?= $blog['first_name'] . ' ' . $blog['middle_name'] . ' ' . $blog['last_name'] ?></p>
-                                    </div>
-                                    <div class="card-body d-flex">
-                                        <a class="text-decoration-none ms-auto" href="<?= base_url("blogs/view/{$blog['slug']}") ?>">
-                                            Read More
-                                        </a>
+                if (isset($blogs) && !empty($blogs)) {
+                    foreach ($blogs as $blog) { ?>
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3 d-flex">
+                            <div class="card blog-card w-100">
+                                <img src="<?= base_url('blogs/thumbnail/' . $blog['thumbnail']) ?>" alt="<?= esc($blog['title']) ?>">
+                                <div class="card-body blog-body">
+                                    <h5 class="card-title fw-bold">
+                                        <?= esc($blog['title']) ?>
+                                    </h5>
+                                    <p class="card-text content"><?= get_introduction($blog['content']) ?></p>
+                                    <div class="mt-auto">
+                                        <p class="card-text author my-0"><b>Last Modified:</b> <?= (new DateTime($blog['updated_at']))->format('F j, Y') ?></p>
+                                        <p class="card-text last-modified my-0"><b>Author:</b> <?= $blog['first_name'] . ' ' . $blog['middle_name'] . ' ' . $blog['last_name'] ?></p>
                                     </div>
                                 </div>
+                                <div class="card-body d-flex pt-0">
+                                    <a class="text-decoration-none mt-top ms-auto" href="<?= base_url("blogs/view/{$blog['slug']}") ?>">
+                                        Read More
+                                    </a>
+                                </div>
                             </div>
+                        </div>
                 <?php 
-                        }
-                    } else {
-                        echo '<div class="col-12 text-center"><p class="text-muted">No blogs found</p></div>';
                     }
+                } else {
+                    echo '<div class="col-12 text-center"><p class="text-muted">No blogs found</p></div>';
+                }
                 ?>
             </div>
+
+            <!-- Add this before the closing </div> of the main container -->
+            <?php if (isset($currentPage) && isset($totalPages)): ?>
+            <div class="row mt-4">
+                <div class="col-12">
+                    <nav aria-label="Blog pagination">
+                        <ul class="pagination justify-content-center">
+                            <?php if (isset($hasPrevPage) && $hasPrevPage): ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=<?= $currentPage - 1 ?>" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo; Previous</span>
+                                    </a>
+                                </li>
+                            <?php else: ?>
+                                <li class="page-item disabled">
+                                    <span class="page-link" aria-hidden="true">&laquo; Previous</span>
+                                </li>
+                            <?php endif; ?>
+
+                            <?php if (isset($hasNextPage) && $hasNextPage): ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=<?= $currentPage + 1 ?>" aria-label="Next">
+                                        <span aria-hidden="true">Next &raquo;</span>
+                                    </a>
+                                </li>
+                            <?php else: ?>
+                                <li class="page-item disabled">
+                                    <span class="page-link" aria-hidden="true">Next &raquo;</span>
+                                </li>
+                            <?php endif; ?>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            <?php endif; ?>
         </div>
         <!--end::Container-->
     </div>
     <!--end::App Content-->
 </main>
 <!--end::App Main-->
-
-<style>
-    .category-chips-container {
-        position: relative;
-        width: 100%;
-        overflow: hidden;
-        padding: 0.5rem 0;
-        margin-bottom: 1rem;
-    }
-
-    .category-chips-scroll {
-        display: flex;
-        gap: 0.75rem;
-        overflow-x: auto;
-        scrollbar-width: none; /* Firefox */
-        -ms-overflow-style: none; /* IE and Edge */
-        padding: 0.5rem 0;
-        scroll-behavior: smooth;
-    }
-
-    .category-chips-scroll::-webkit-scrollbar {
-        display: none; /* Chrome, Safari, Opera */
-    }
-
-    .category-chip {
-        display: inline-flex;
-        align-items: center;
-        padding: 0.5rem 1rem;
-        background-color: #f2f2f2;
-        color: #0f0f0f;
-        border-radius: 8px;
-        font-size: 0.875rem;
-        font-weight: 500;
-        white-space: nowrap;
-        text-decoration: none;
-        transition: all 0.2s ease;
-        border: 1px solid #e5e5e5;
-        cursor: pointer;
-    }
-
-    .category-chip:hover {
-        background-color: #e5e5e5;
-        color: #0f0f0f;
-        text-decoration: none;
-    }
-
-    .category-chip.active {
-        background-color: #0f0f0f;
-        color: #ffffff;
-        border-color: #0f0f0f;
-    }
-
-    .category-chips-arrow {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        background-color: #ffffff;
-        border: 1px solid #e5e5e5;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        z-index: 2;
-        transition: all 0.2s ease;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .category-chips-arrow:hover {
-        background-color: #f2f2f2;
-    }
-
-    .category-chips-arrow-left {
-        left: 0;
-    }
-
-    .category-chips-arrow-right {
-        right: 0;
-    }
-
-    [data-bs-theme="dark"] .category-chip {
-        background-color: #272727;
-        color: #ffffff;
-        border-color: #3f3f3f;
-    }
-
-    [data-bs-theme="dark"] .category-chip:hover {
-        background-color: #3f3f3f;
-    }
-
-    [data-bs-theme="dark"] .category-chip.active {
-        background-color: #ffffff;
-        color: #0f0f0f;
-        border-color: #ffffff;
-    }
-
-    [data-bs-theme="dark"] .category-chips-arrow {
-        background-color: #0f0f0f;
-        border-color: #3f3f3f;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    }
-
-    [data-bs-theme="dark"] .category-chips-arrow:hover {
-        background-color: #272727;
-    }
-</style>
 
 <script>
 function scrollCategories(direction) {

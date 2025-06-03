@@ -4,6 +4,7 @@ namespace Config;
 
 use App\Filters\AuthFilter;
 use App\Filters\AdminFilter;
+use App\Filters\NoAuthFilter;
 use CodeIgniter\Config\Filters as BaseFilters;
 use CodeIgniter\Filters\Cors;
 use CodeIgniter\Filters\CSRF;
@@ -38,6 +39,7 @@ class Filters extends BaseFilters
         'performance'   => PerformanceMetrics::class,
         'auth'          => AuthFilter::class,
         'admin'         => AdminFilter::class,
+        'noauth'        => NoAuthFilter::class,
     ];
 
     /**
@@ -122,6 +124,15 @@ class Filters extends BaseFilters
                 'categories/*',
                 'dashboard',
                 'dashboard/*',
+            ]
+        ],
+        'noauth' => [
+            'before' => [
+                'login',
+                'register',
+                'forgot-password',
+                'reset-password/*',
+                'verification-pending',
             ]
         ]
     ];
