@@ -17,6 +17,11 @@
             content="blog, post, article"
         />
         <!--end::Primary Meta Tags-->
+
+        <!-- Favicons -->
+        <link href="/assets/img/case-logo.png" rel="icon">
+        <link href="/assets/img/case-logo.png" rel="apple-touch-icon">
+
         <?= $this->include('components/styles') ?>
         <?= $this->renderSection('styles') ?>
     </head>

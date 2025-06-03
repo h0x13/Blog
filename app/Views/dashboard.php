@@ -156,21 +156,21 @@ Dashboard
                   <!-- /.card-header -->
                   <div class="card-body">
                     <?php if (!empty($recent_activities)): ?>
-                      <table class="table table-bordered">
-                        <thead>
-                          <tr>
-                            <th style="width: 10px">#</th>
+                    <table class="table table-bordered">
+                      <thead>
+                        <tr>
+                          <th style="width: 10px">#</th>
                             <th>User</th>
                             <th>Action</th>
                             <th>Time</th>
-                          </tr>
-                        </thead>
-                        <tbody>
+                        </tr>
+                      </thead>
+                      <tbody>
                           <?php foreach ($recent_activities as $index => $activity): ?>
-                            <tr class="align-middle">
+                        <tr class="align-middle">
                               <td><?= $index + 1 ?></td>
                               <td><?= $activity['first_name'] ?> <?= $activity['last_name'] ?></td>
-                              <td>
+                          <td>
                                 <?php
                                 $actionIcon = match($activity['action_type']) {
                                     'blog_create' => 'bi-file-earmark-plus',
@@ -187,12 +187,12 @@ Dashboard
                                 ?>
                                 <i class="bi <?= $actionIcon ?> me-2"></i>
                                 <?= ucwords(str_replace('_', ' ', $activity['action_type'])) ?>
-                              </td>
+                          </td>
                               <td><?= (new DateTime($activity['created_at']))->format('g:i A') ?></td>
-                            </tr>
+                        </tr>
                           <?php endforeach; ?>
-                        </tbody>
-                      </table>
+                      </tbody>
+                    </table>
                     <?php else: ?>
                       <div class="text-center py-4">
                         <p class="text-muted mb-0">No recent activities found.</p>

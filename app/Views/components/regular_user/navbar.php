@@ -31,6 +31,7 @@
         <ul class="navbar-nav ms-auto">
             <!--begin::User Menu Dropdown-->
             <li class="nav-item dropdown user-menu">
+                <?php if(session()->get('isLoggedIn')): ?>
                 <a
                     href="#"
                     class="nav-link dropdown-toggle"
@@ -82,6 +83,54 @@
                         </li>
                     </ul>
                 </div>
+                <?php else: ?>
+                    <a
+                    href="#"
+                    class="nav-link dropdown-toggle"
+                    data-bs-toggle="dropdown"
+                >
+                    <img
+                        src="<?= base_url('assets/img/default-avatar.svg') ?>"
+                        class="user-image rounded-circle shadow border"
+                        alt="User Image"
+                    />
+                    <span>Guest</span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end rounded">
+                    <ul class="list-group">
+                        <li class="list-group-item border-bottom">
+                            <div class="d-flex align-items-center">
+                                <img
+                                    src="<?= base_url('assets/img/default-avatar.svg') ?>"
+                                    class="rounded-circle shadow me-2"
+                                    alt="User Image"
+                                    style="max-width: 40px;"
+                                />
+                                <div class="d-flex flex-column">
+                                    <p class="fw-bold">
+                                        Guest
+                                    </p>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="<?= base_url('sign-in') ?>" class="text-decoration-none text-adaptive d-block w-100">
+                                <i class="bi bi-box-arrow-in-right me-2"></i> Sign in
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="#SwitchTheme" class="text-decoration-none text-adaptive d-block w-100">
+                                <i class="bi bi-moon-fill me-2"></i> Switch theme
+                            </a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="/" class="text-decoration-none text-adaptive d-block w-100">
+                                <i class="bi bi-house me-2"></i> Home
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <?php endif; ?>
             </li>
             <!--end::User Menu Dropdown-->
         </ul>

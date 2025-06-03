@@ -53,19 +53,19 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     // Protected blog routes
     $routes->group('blogs', function($routes) {
         $routes->get('manage/', [Blog::class, 'manage']);
-        $routes->get('add', [Blog::class, 'create']);
-        $routes->post('add', [Blog::class, 'store']);
-        $routes->get('edit/(:segment)', [Blog::class, 'update/$1']);
-        $routes->post('edit/(:segment)', [Blog::class, 'save/$1']);
-        $routes->post('delete/(:segment)', [Blog::class, 'delete/$1']);
-        $routes->post('upload_image', [Blog::class, 'upload_image']);
-        $routes->post('delete_image', [Blog::class, 'delete_image']);
+    $routes->get('add', [Blog::class, 'create']);
+    $routes->post('add', [Blog::class, 'store']);
+    $routes->get('edit/(:segment)', [Blog::class, 'update/$1']);
+    $routes->post('edit/(:segment)', [Blog::class, 'save/$1']);
+    $routes->post('delete/(:segment)', [Blog::class, 'delete/$1']);
+    $routes->post('upload_image', [Blog::class, 'upload_image']);
+    $routes->post('delete_image', [Blog::class, 'delete_image']);
 
-        // Comments and Reactions
-        $routes->post('comment/add', [Blog::class, 'addComment']);
-        $routes->post('comment/reply', [Blog::class, 'addReply']);
-        $routes->post('reaction/blog', [Blog::class, 'reactToBlog']);
-        $routes->post('reaction/comment', [Blog::class, 'reactToComment']);
+    // Comments and Reactions
+    $routes->post('comment/add', [Blog::class, 'addComment']);
+    $routes->post('comment/reply', [Blog::class, 'addReply']);
+    $routes->post('reaction/blog', [Blog::class, 'reactToBlog']);
+    $routes->post('reaction/comment', [Blog::class, 'reactToComment']);
     });
 
     // Activity logs
@@ -84,7 +84,7 @@ $routes->group('', ['filter' => 'admin'], function($routes) {
     $routes->get('/users', [User::class, 'index']);
     $routes->get('/categories', [Category::class, 'index']);
     $routes->get('/admin/audit-logs', [AdminAuditLogController::class, 'index']);
-    
+
     // User management routes
     $routes->group('users', function($routes) {
         $routes->post('add', [User::class, 'add']);

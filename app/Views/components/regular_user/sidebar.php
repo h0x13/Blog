@@ -46,6 +46,7 @@ function isActivePage($page) {
                         <p>Popular</p>
                     </a>
                 </li>
+                <?php if(session()->get('isLoggedIn')): ?>
                 <li class="nav-item">
                     <a
                         href="/blogs/manage"
@@ -62,6 +63,7 @@ function isActivePage($page) {
                         <p>Activity Log</p>
                     </a>
                 </li>
+                <?php endif; ?>
             </ul>
             <!--end::Sidebar Menu-->
         </nav>
