@@ -6,6 +6,7 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="POST" action="<?= base_url('categories/update') ?>" enctype="multipart/form-data" id="editCategoryForm">
+                <?= csrf_field() ?>
                 <div class="modal-body">
                     <input type="hidden" name="action" value="edit_category">
 

@@ -6,6 +6,7 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="POST" action="<?= base_url('categories/delete') ?>" id="deleteCategoryForm">
+                <?= csrf_field() ?>
                 <div class="modal-body">
                     <h5 class="alert-heading">Warning!</h5>
                     <p>Are you sure you want to delete <b id="deleteCategoryName">this</b> category?</p>
