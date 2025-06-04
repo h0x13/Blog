@@ -34,7 +34,7 @@ class User extends BaseController
             'middle_name' => 'permit_empty|min_length[2]|max_length[50]',
             'email' => 'required|valid_email|is_unique[users.email]',
             'password' => 'required|min_length[8]',
-            'role' => 'required|in_list[admin,author,viewer]',
+            'role' => 'required|in_list[admin,user]',
             'is_enabled' => 'required|in_list[0,1]',
             'gender' => 'permit_empty|in_list[Male,Female,Other]',
             'birthdate' => 'permit_empty|valid_date',
@@ -91,12 +91,15 @@ class User extends BaseController
             'middle_name' => 'permit_empty|min_length[2]|max_length[50]',
             'email' => "required|valid_email|is_unique[users.email,user_id,{$id}]",
             'password' => 'permit_empty|min_length[8]',
-            'role' => 'required|in_list[admin,author,viewer]',
+            'role' => 'required|in_list[admin,user]',
             'is_enabled' => 'required|in_list[0,1]',
-            'gender' => 'permit_empty|in_list[male,female,other]',
+            'gender' => 'permit_empty|in_list[Male,Female,Other]',
             'birthdate' => 'permit_empty|valid_date',
             'image' => 'permit_empty|max_size[image,2048]|is_image[image]|mime_in[image,image/jpg,image/jpeg,image/png]'
         ])) {
+             // Log validation errors for debugging purposes
+        log_message('error', 'Validation Errors: ' . json_encode($this->validation->getErrors()));
+
             return redirect()->back()
                 ->withInput()
                 ->with('validation', $this->validation)

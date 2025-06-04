@@ -115,6 +115,7 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById('editEmail').value = email;
             document.getElementById('editRole').value = role;
             document.getElementById('editStatus').value = status;
+            console.log(gender);
             document.getElementById('editGender').value = gender;
             document.getElementById('editBirthdate').value = birthdate;
             

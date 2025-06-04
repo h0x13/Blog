@@ -6,6 +6,7 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="POST" action="" id="deleteUserForm">
+                <?= csrf_field() ?>
                 <div class="modal-body">
                     <input type="hidden" id="deleteUserId" name="id">
                     <h5 class="alert-heading">Warning!</h5>

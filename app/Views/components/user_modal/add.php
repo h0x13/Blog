@@ -6,6 +6,7 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="POST" action="<?= base_url('users/add') ?>" enctype="multipart/form-data" id="addUserForm">
+                <?= csrf_field() ?>
                 <div class="modal-body">
                     <input type="hidden" name="action" value="add_user">
 
@@ -109,8 +110,7 @@
                                             <label for="addRole" class="form-label">Role <span class="text-danger">*</span></label>
                                             <select class="form-select <?= isset($validation) && $validation->hasError('role') ? 'is-invalid' : '' ?>" id="addRole" name="role" required>
                                                 <option value="admin" <?= old('role') == 'admin' ? 'selected' : '' ?>>Admin</option>
-                                                <option value="author" <?= old('role') == 'author' ? 'selected' : '' ?>>Author</option>
-                                                <option value="viewer" <?= old('role') == 'viewer' ? 'selected' : '' ?>>Viewer</option>
+                                                <option value="user" <?= old('role') == 'user' ? 'selected' : '' ?>>User</option>
                                             </select>
                                             <?php if (isset($validation) && $validation->hasError('role')): ?>
                                                 <div class="invalid-feedback"><?= $validation->getError('role') ?></div>

@@ -6,6 +6,7 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="POST" action="" enctype="multipart/form-data" id="editUserForm">
+                <?= csrf_field() ?>
                 <div class="modal-body">
                     <input type="hidden" id="editUserId" name="id">
                     <input type="hidden" id="editCurrentImage" name="current_image">
@@ -89,8 +90,7 @@
                                             <label for="editRole" class="form-label">Role <span class="text-danger">*</span></label>
                                             <select class="form-select" id="editRole" name="role" required>
                                                 <option value="admin">Admin</option>
-                                                <option value="author">Author</option>
-                                                <option value="viewer">Viewer</option>
+                                                <option value="user">User</option>
                                             </select>
                                         </div>
                                         <div class="col-md-6">

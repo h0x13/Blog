@@ -31,7 +31,7 @@ Users
 
     <!--begin::App Content-->
     <div class="app-content">
-
+        <?= $this->include('blog_pages/message') ?>
         <!-- Message Display -->
         <?php if (session()->getFlashdata('message')): ?>
             <div class="container-fluid">
