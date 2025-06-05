@@ -34,6 +34,8 @@ $routes->post('reset-password', 'Home::processResetPassword');
 
 // Verification routes
 $routes->get('verify-email/(:segment)', [VerificationController::class, 'verify/$1']);
+$routes->get('verification/success', [VerificationController::class, 'success']);
+$routes->get('verification/check-status', [VerificationController::class, 'checkStatus']);
 $routes->get('resend-verification', [VerificationController::class, 'resendVerification']);
 
 // Public blog routes (no auth required)

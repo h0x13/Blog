@@ -46,6 +46,15 @@
         </div>
         <!--end::App Wrapper-->
         <?= $this->renderSection('scripts') ?>
+        <script>
+            const allImages = document.querySelectorAll('img');
+            allImages.forEach(img => {
+                img.addEventListener('error', () => {
+                img.src = '<?= base_url("assets/img/no-image.png") ?>';
+                img.alt = 'Image not found';
+                });
+            });
+        </script>
     </body>
     <!--end::Body-->
 </html>

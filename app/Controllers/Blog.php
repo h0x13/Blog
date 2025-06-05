@@ -47,11 +47,12 @@ class Blog extends BaseController
         $builder = $db->table('blogs b');
         $builder->select('b.*, u.first_name, u.middle_name, u.last_name');
         $builder->join('users u', 'u.user_id = b.user_id');
+        $builder->where('b.visibility', 'public'); // Only public blogs
         $builder->orderBy('b.created_at', 'DESC');
 
         // Get total count for pagination
         $total = $builder->countAllResults(false);
-        
+
         // Set up pagination
         $perPage = 12;
         $currentPage = $this->request->getGet('page') ?? 1;
@@ -61,6 +62,7 @@ class Blog extends BaseController
         $builder->resetQuery();
         $builder->select('b.*, u.first_name, u.middle_name, u.last_name');
         $builder->join('users u', 'u.user_id = b.user_id');
+        $builder->where('b.visibility', 'public'); // Only public blogs
         $builder->orderBy('b.created_at', 'DESC');
         $builder->limit($perPage, $offset);
         $blogs = $builder->get()->getResultArray();
@@ -90,8 +92,7 @@ class Blog extends BaseController
 
         $db = \Config\Database::connect();
         $builder = $db->table('blogs b');
-        
-        // Build the popularity score calculation
+
         $builder->select('
             b.*, 
             u.first_name, 
@@ -104,12 +105,13 @@ class Blog extends BaseController
         $builder->join('users u', 'u.user_id = b.user_id');
         $builder->join('comments c', 'c.blog_id = b.blog_id', 'left');
         $builder->join('blog_reactions br', 'br.blog_id = b.blog_id', 'left');
+        $builder->where('b.visibility', 'public'); // Only public blogs
         $builder->groupBy('b.blog_id, u.first_name, u.middle_name, u.last_name');
         $builder->orderBy('popularity_score', 'DESC');
 
         // Get total count for pagination
         $total = $builder->countAllResults(false);
-        
+
         // Set up pagination
         $perPage = 12;
         $currentPage = $this->request->getGet('page') ?? 1;
@@ -129,6 +131,7 @@ class Blog extends BaseController
         $builder->join('users u', 'u.user_id = b.user_id');
         $builder->join('comments c', 'c.blog_id = b.blog_id', 'left');
         $builder->join('blog_reactions br', 'br.blog_id = b.blog_id', 'left');
+        $builder->where('b.visibility', 'public'); // Only public blogs
         $builder->groupBy('b.blog_id, u.first_name, u.middle_name, u.last_name');
         $builder->orderBy('popularity_score', 'DESC');
         $builder->limit($perPage, $offset);
@@ -274,7 +277,7 @@ class Blog extends BaseController
             }
             
             $this->blogModel->db->transCommit();
-            return redirect()->to('blogs')->with('success', 'Blog created successfully!');
+            return redirect()->to('blogs/manage')->with('success', 'Blog created successfully!');
             
         } catch (\Exception $e) {
             $this->blogModel->db->transRollback();
@@ -404,7 +407,7 @@ class Blog extends BaseController
         }
 
         $this->blogModel->delete($blog['blog_id']);
-        return redirect()->to("blogs")->with('success', "<b>{$blog['title']}</b> by <b>{$user['first_name']} {$user['last_name']}</b> deleted successfully!");
+        return redirect()->to("blogs/manage")->with('success', "<b>{$blog['title']}</b> by <b>{$user['first_name']} {$user['last_name']}</b> deleted successfully!");
     }
 
 
@@ -480,12 +483,13 @@ class Blog extends BaseController
             'blogs' => $this->blogModel
                 ->select('blogs.*, users.first_name, users.last_name, users.middle_name')
                 ->join('users', 'users.user_id = blogs.user_id')
+                ->where('blogs.visibility', 'public') // Only public blogs
                 ->like('blogs.title', $query)
                 ->findAll(),
             'categories' => $this->categoryModel->findAll(),
             'search_query' => $query,
             'validation' => $this->validation,
-            'type' => 'recent' // Default to recent blogs for search results
+            'type' => 'recent'
         ];
         return view('blogs', $data);
     }
@@ -493,7 +497,7 @@ class Blog extends BaseController
     public function search()
     {
         $query = $this->request->getGet('query');
-        
+
         if (empty($query)) {
             return $this->response->setJSON([]);
         }
@@ -502,8 +506,8 @@ class Blog extends BaseController
             $blogs = $this->blogModel
                 ->select('blogs.*, users.first_name, users.last_name, users.middle_name')
                 ->join('users', 'users.user_id = blogs.user_id')
+                ->where('blogs.visibility', 'public') // Only public blogs
                 ->like('blogs.title', $query)
-                // ->orLike('blogs.content', $query)
                 ->findAll();
 
             // Get categories for each blog

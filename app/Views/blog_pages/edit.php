@@ -204,6 +204,7 @@
 <div class="modal fade" id="deleteBlogModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <form action="/blogs/delete/<?= $blog['slug'] ?>" method="POST" class="modal-content">
+        <?= csrf_field() ?>
       <div class="modal-header">
         <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -213,6 +214,7 @@
         <p>
           Please type <strong class="text-danger"><?= $blog['slug'] ?></strong> to confirm deletion.
         </p>
+        <p class="text-danger"><strong>Warning:</strong> This action is irreversible and cannot be undone.</p>
         
         <input 
           type="text" 

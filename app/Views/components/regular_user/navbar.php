@@ -218,7 +218,7 @@
 }
 
 [data-bs-theme="dark"] #searchResults a:hover {
-    background-color: var(--bs-gray-800);
+    background-color: rgb(19, 19, 19);
 }
 
 [data-bs-theme="dark"] .search-result-author {
@@ -226,7 +226,7 @@
 }
 
 [data-bs-theme="dark"] .search-result-category {
-    background-color: var(--bs-gray-800);
+    background-color:rgb(29, 29, 29);
     color: var(--bs-gray-400);
 }
 </style>

@@ -90,9 +90,10 @@ class Home extends BaseController
     public function processRegistration()
     {
         $rules = [
-            'first_name' => 'required|min_length[2]|max_length[100]',
-            'last_name' => 'required|min_length[2]|max_length[100]',
-            'email' => 'required|valid_email|is_unique[users.email]',
+            'first_name' => 'required|min_length[2]|max_length[50]',
+            'last_name' => 'required|min_length[2]|max_length[50]',
+            'middle_name' => 'permit_empty|min_length[2]|max_length[50]',
+            'email' => 'required|valid_email',
             'password' => 'required|min_length[8]',
             'gender' => 'permit_empty|in_list[male,female]',
             'birthdate' => 'permit_empty|valid_date'
@@ -105,13 +106,20 @@ class Home extends BaseController
         }
 
         try {
-            $userModel = new \App\Models\UserModel();
-            $userId = $userModel->register($this->request->getPost());
+            $userId = $this->userModel->register($this->request->getPost());
 
             if ($userId) {
                 // Store email in session for verification page
                 session()->set('temp_email', $this->request->getPost('email'));
                 return redirect()->to('/verification-pending');
+            }
+
+            // If registration failed because email is already verified
+            $existingUser = $this->userModel->where('email', $this->request->getPost('email'))->first();
+            if ($existingUser && $existingUser['is_enabled']) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'This email is already registered and verified. Please login instead.');
             }
 
             return redirect()->back()

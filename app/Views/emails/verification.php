@@ -91,7 +91,7 @@
             </div>
 
             <div class="warning">
-                <strong>Note:</strong> This verification link will expire in 24 hours. If you did not create an account, you can safely ignore this email.
+                <strong>Note:</strong> This verification link will expire in 5 minutes. If you did not create an account, you can safely ignore this email.
             </div>
 
             <div class="footer">

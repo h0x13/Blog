@@ -25,10 +25,41 @@ class VerificationController extends BaseController
 
         if ($userId) {
             $this->userModel->update($userId, ['is_enabled' => true]);
-            return redirect()->to('/login')->with('success', 'Email verified successfully. You can now login.');
+            
+            // If it's an AJAX request, return JSON response
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON(['verified' => true]);
+            }
+            
+            return redirect()->to('/verification/success');
+        }
+
+        // If it's an AJAX request, return JSON response
+        if ($this->request->isAJAX()) {
+            return $this->response->setJSON(['verified' => false]);
         }
 
         return redirect()->to('/login')->with('error', 'Invalid or expired verification link.');
+    }
+
+    public function success()
+    {
+        return view('verification_success');
+    }
+
+    public function checkStatus()
+    {
+        $email = session()->get('temp_email');
+        
+        if (!$email) {
+            return $this->response->setJSON(['verified' => false]);
+        }
+
+        $user = $this->userModel->where('email', $email)->first();
+        
+        return $this->response->setJSON([
+            'verified' => $user['is_enabled'] ?? false
+        ]);
     }
 
     public function resendVerification()

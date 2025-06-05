@@ -64,11 +64,42 @@ class UserModel extends Model
     public function register($data)
     {
         try {
-            // Set default values
+            // Check if user already exists with this email
+            $existingUser = $this->where('email', $data['email'])->first();
+
+            if ($existingUser) {
+                // If user exists but is not verified, update their data
+                if (!$existingUser['is_enabled']) {
+                    // Update user data
+                    $this->update($existingUser['user_id'], [
+                        'first_name' => $data['first_name'],
+                        'last_name' => $data['last_name'],
+                        'middle_name' => $data['middle_name'] ?? null,
+                        'password' => $data['password'],
+                        'gender' => $data['gender'] ?? null,
+                        'birthdate' => $data['birthdate'] ?? null
+                    ]);
+
+                    // Create new verification
+                    $emailVerificationModel = new EmailVerificationModel();
+                    $token = $emailVerificationModel->createVerification($existingUser['user_id']);
+
+                    // Send new verification email
+                    $emailService = new EmailService();
+                    $emailService->sendVerificationEmail($data['email'], $token);
+
+                    return $existingUser['user_id'];
+                } else {
+                    // User is already verified, return false to indicate conflict
+                    return false;
+                }
+            }
+
+            // Set default values for new user
             $data['is_enabled'] = false; // User needs to verify email first
             $data['role'] = 'user';
 
-            // Insert the user
+            // Insert the new user
             $userId = $this->insert($data);
 
             if ($userId) {

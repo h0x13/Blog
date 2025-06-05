@@ -92,34 +92,29 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const switchThemeButtons = document.querySelectorAll('a[href="#SwitchTheme"]');
-        const theme = localStorage.getItem('data-bs-theme') || 'light';
-        document.body.setAttribute('data-bs-theme', theme);
+        const theme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-bs-theme', theme);
 
         switchThemeButtons.forEach(button => {
             button.addEventListener('click', event => {
                 event.preventDefault();
-                const theme = document.body.getAttribute('data-bs-theme');
-                if (theme === 'light') {
-                    button.querySelector('i').classList.remove('bi-moon-fill');
-                    button.querySelector('i').classList.add('bi-sun-fill');
-                    document.body.setAttribute('data-bs-theme', 'dark')
-                    localStorage.setItem('data-bs-theme', 'dark');
-                } else {
-                    button.querySelector('i').classList.remove('bi-sun-fill');
-                    button.querySelector('i').classList.add('bi-moon-fill');
-                    document.body.setAttribute('data-bs-theme', 'light')
-                    localStorage.setItem('data-bs-theme', 'light');
-                }
+                const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                
+                document.documentElement.setAttribute('data-bs-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                
+                // Update icon
+                const icon = button.querySelector('i');
+                icon.classList.remove(currentTheme === 'light' ? 'bi-moon-fill' : 'bi-sun-fill');
+                icon.classList.add(newTheme === 'light' ? 'bi-moon-fill' : 'bi-sun-fill');
             });
 
-            const theme = document.body.getAttribute('data-bs-theme');
-            if (theme === 'light') {
-                button.querySelector('i').classList.remove('bi-moon-fill');
-                button.querySelector('i').classList.add('bi-sun-fill');
-            } else {
-                button.querySelector('i').classList.remove('bi-sun-fill');
-                button.querySelector('i').classList.add('bi-moon-fill');
-            }
+            // Set initial icon state
+            const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+            const icon = button.querySelector('i');
+            icon.classList.remove(currentTheme === 'light' ? 'bi-sun-fill' : 'bi-moon-fill');
+            icon.classList.add(currentTheme === 'light' ? 'bi-moon-fill' : 'bi-sun-fill');
         });
     });
 </script>

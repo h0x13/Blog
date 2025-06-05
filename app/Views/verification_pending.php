@@ -26,42 +26,104 @@
             <?php endif; ?>
 
             <div class="text-center mb-4">
-                <i class="fas fa-envelope fa-3x text-primary mb-3"></i>
-                <p class="mb-0">
-                    We've sent a verification email to:<br>
-                    <strong class="text-primary"><?= esc(session('temp_email')) ?></strong>
-                </p>
+                <div id="verificationStatus">
+                    <div class="spinner-border text-primary mb-3" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mb-0">
+                        Waiting for email verification...<br>
+                        <small class="text-muted">Please check your email and click the verification link.</small>
+                    </p>
+                </div>
             </div>
 
             <div class="alert alert-info mb-4">
                 <p class="mb-0">
-                    Please check your email and click the verification link to activate your account.
-                    If you don't see the email, please check your spam folder.
+                    A verification email has been sent to:<br>
+                    <strong class="text-primary"><?= esc(session('temp_email')) ?></strong><br>
+                    <small class="text-muted">The verification link will expire in 5 minutes.</small>
                 </p>
             </div>
 
-            <div class="row mb-3">
-                <div class="col-12">
-                    <a href="<?= base_url('verification/resend') ?>" class="btn btn-primary w-100">
-                        <i class="fas fa-paper-plane me-2"></i>
-                        Resend Verification Email
-                    </a>
-                </div>
-            </div>
-
-            <div class="row mb-3">
-                <div class="col-12">
-                    <a href="<?= base_url('login') ?>" class="btn btn-outline-secondary w-100">
-                        <i class="fas fa-sign-in-alt me-2"></i>
-                        Back to Login
-                    </a>
-                </div>
-            </div>
-
             <p class="text-center text-muted mb-0">
-                <small>The verification link will expire in 24 hours.</small>
+                <small>If you don't see the email, please check your spam folder.</small>
             </p>
         </div>
     </section>
 </main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let isChecking = true;
+    let checkCount = 0;
+    const maxChecks = 60; // 5 minutes (5 seconds * 60)
+
+    // Check verification status every 5 seconds
+    const checkVerification = setInterval(function() {
+        if (!isChecking) {
+            clearInterval(checkVerification);
+            return;
+        }
+
+        checkCount++;
+        if (checkCount >= maxChecks) {
+            clearInterval(checkVerification);
+            document.getElementById('verificationStatus').innerHTML = `
+                <i class="bi bi-exclamation-circle-fill text-danger fa-3x mb-3"></i>
+                <p class="mb-0">
+                    Verification link expired.<br>
+                    <small class="text-muted">Please contact support for assistance.</small>
+                </p>
+            `;
+            return;
+        }
+
+        fetch('<?= base_url('verification/check-status') ?>')
+            .then(response => response.json())
+            .then(data => {
+                if (+data.verified) {
+                    isChecking = false;
+                    clearInterval(checkVerification);
+                    document.getElementById('verificationStatus').innerHTML = `
+                        <i class="bi bi-check-circle-fill text-success fa-3x mb-3"></i>
+                        <p class="mb-3">
+                            Email verified successfully!<br>
+                            <small class="text-muted">Your email <?= esc(session('temp_email')) ?> has been verified.</small>
+                        </p>
+                        <a href="<?= base_url('login') ?>" class="btn btn-primary" onclick="stopChecking()">Go to Login</a>
+                    `;
+                } else {
+                    // Keep showing loading spinner if not verified
+                    document.getElementById('verificationStatus').innerHTML = `
+                        <div class="spinner-border text-primary mb-3" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mb-0">
+                            Waiting for email verification...<br>
+                            <small class="text-muted">Please check your email and click the verification link.</small>
+                        </p>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Error checking verification status:', error);
+                isChecking = false;
+                clearInterval(checkVerification);
+                document.getElementById('verificationStatus').innerHTML = `
+                    <i class="bi bi-exclamation-circle-fill text-danger fa-3x mb-3"></i>
+                    <p class="mb-0">
+                        Error checking verification status.<br>
+                        <small class="text-muted">Please refresh the page and try again.</small>
+                    </p>
+                `;
+            });
+    }, 5000);
+
+    // Function to stop checking verification status
+    window.stopChecking = function() {
+        isChecking = false;
+        clearInterval(checkVerification);
+    };
+});
+</script>
 <?= $this->endSection() ?> 

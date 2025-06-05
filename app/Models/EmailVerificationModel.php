@@ -17,7 +17,7 @@ class EmailVerificationModel extends Model
     {
         $token = bin2hex(random_bytes(32));
         $now = new \DateTime('now', new \DateTimeZone('UTC'));
-        $now->modify('+24 hours');
+        $now->modify('+5 minutes');
         $expiresAt = $now->format('Y-m-d H:i:s');
 
         $data = [
