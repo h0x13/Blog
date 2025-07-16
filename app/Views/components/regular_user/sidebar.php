@@ -13,7 +13,7 @@ function isActivePage($page) {
     <!--begin::Sidebar Brand-->
     <div class="sidebar-brand">
         <!--begin::Brand Link-->
-        <a href="#" class="brand-link d-flex justify-content-center align-items-center">
+        <a href="/" class="brand-link d-flex justify-content-center align-items-center">
             <!--begin::Brand Text-->
             <span class="brand-text fw-bold">BlogHub</span>
             <!--end::Brand Text-->

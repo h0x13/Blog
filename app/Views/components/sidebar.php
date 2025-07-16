@@ -15,7 +15,6 @@ function isActivePage($page) {
         <!--begin::Brand Link-->
         <a href="/" class="brand-link d-flex justify-content-center align-items-center">
             <!--begin::Brand Text-->
-            <img src="" alt="Logo">
             <span class="brand-text fw-bold">BlogHub</span>
             <!--end::Brand Text-->
         </a>
